@@ -18,8 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with HDMImatrix.  If not, see <http://www.gnu.org/licenses/>.
 from PySide import QtGui, QtCore
-import matrix_ui
-class matrix(QtGui.QMainWindow, matrix_ui.Ui_MainWindow):
+class matrix(QtGui.QMainWindow):
     def __init__(self,
                  inputs=["IN1", "IN2", "IN3", "foo", "bar"],
                  outputs=["OUT1", "OUT2", "OUT3","OUT4"],
@@ -32,11 +31,57 @@ class matrix(QtGui.QMainWindow, matrix_ui.Ui_MainWindow):
         self.out4in=[]
 
 
-        self.setupUi(self)
         self.setupUI()
 
-
     def setupUI(self):
+        #self.resize(168, 146)
+        self.centralwidget = QtGui.QWidget(self)
+        self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
+        self.groupBox = QtGui.QGroupBox(self.centralwidget)
+        self.gridLayout = QtGui.QGridLayout(self.groupBox)
+        self.label = QtGui.QLabel(self.groupBox)
+        self.label.setText("")
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.verticalLayout.addWidget(self.groupBox)
+        self.setCentralWidget(self.centralwidget)
+
+        self.menubar = QtGui.QMenuBar(self)
+        #self.menubar.setGeometry(QtCore.QRect(0, 0, 168, 19))
+        self.setMenuBar(self.menubar)
+
+        self.menuFile = QtGui.QMenu(self.menubar)
+
+        self.menuConfiguration = QtGui.QMenu(self.menubar)
+        self.menuSerial_Ports = QtGui.QMenu(self.menuConfiguration)
+
+        self.actionQuit = QtGui.QAction(self)
+        self.actionNull = QtGui.QAction(self)
+        self.actionRead_Settings = QtGui.QAction(self)
+        self.actionRead_Settings.setObjectName("actionRead_Settings")
+
+        self.menuFile.addAction(self.actionRead_Settings)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionQuit)
+        self.menuSerial_Ports.addAction(self.actionNull)
+        self.menuSerial_Ports.addSeparator()
+        self.menuConfiguration.addAction(self.menuSerial_Ports.menuAction())
+        self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuConfiguration.menuAction())
+
+        self.statusbar = QtGui.QStatusBar(self)
+        self.setStatusBar(self.statusbar)
+
+        self.setWindowTitle("MainWindow")
+        self.groupBox.setTitle("HDMImatrix")
+        self.menuFile.setTitle("File")
+        self.menuConfiguration.setTitle("Configuration")
+        self.menuSerial_Ports.setTitle("Serial Ports")
+        self.actionQuit.setText("Quit")
+        self.actionNull.setText("Rescan")
+        self.actionRead_Settings.setText("Read Settings")
+
+        self.setupDynamicUI()
+    def setupDynamicUI(self):
         inputs=self.inputs
         outputs=self.outputs
 
