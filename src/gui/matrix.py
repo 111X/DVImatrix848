@@ -27,7 +27,18 @@ class matrix(QtGui.QMainWindow, matrix_ui.Ui_MainWindow):
         super(matrix, self).__init__()
         self.inputs=inputs
         self.outputs=outputs
+
+        self.outgroup=[]
+        self.out4in=[]
+
+
         self.setupUi(self)
+        self.setupUI()
+
+
+    def setupUI(self):
+        inputs=self.inputs
+        outputs=self.outputs
 
         for innum, input in enumerate(inputs):
             inlabel = QtGui.QLabel(self.groupBox)
@@ -35,9 +46,6 @@ class matrix(QtGui.QMainWindow, matrix_ui.Ui_MainWindow):
             self.gridLayout.addWidget(inlabel, 1+innum, 0, 1, 1)
             inlabel.setText(input)
 
-        self.outgroup=[]
-        self.out4in=[]
-        
         for outnum, output in enumerate(outputs):
             outgroup=QtGui.QButtonGroup(self.groupBox)
             self.outgroup+=[outgroup]
