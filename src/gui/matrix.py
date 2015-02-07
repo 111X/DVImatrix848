@@ -18,6 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with HDMImatrix.  If not, see <http://www.gnu.org/licenses/>.
 from PySide import QtGui, QtCore
+
+import serial
+import time
+
 class matrix(QtGui.QMainWindow):
     def __init__(self,
                  inputs=["IN1", "IN2", "IN3", "foo", "bar"],
@@ -29,9 +33,13 @@ class matrix(QtGui.QMainWindow):
 
         self.outgroup=[]
         self.out4in=[]
+        self.serialPorts=[] # array of name/menuitem pais
 
+        self.serialSelections= QtGui.QActionGroup(self)
+        self.serialSelections.triggered.connect(self.selectSerial)
 
         self.setupUI()
+        self.rescanSerial()
 
     def setupUI(self):
         #self.resize(168, 146)
@@ -55,16 +63,24 @@ class matrix(QtGui.QMainWindow):
         self.menuSerial_Ports = QtGui.QMenu(self.menuConfiguration)
 
         self.actionQuit = QtGui.QAction(self)
-        self.actionNull = QtGui.QAction(self)
+        self.actionQuit.setText("Quit")
+        self.actionQuit.activated.connect(self.exit)
+
+        self.actionRescanSerial = QtGui.QAction(self)
+        self.actionRescanSerial.setText("Rescan")
+        self.actionRescanSerial.activated.connect(self.rescanSerial)
+
         self.actionRead_Settings = QtGui.QAction(self)
-        self.actionRead_Settings.setObjectName("actionRead_Settings")
+        self.actionRead_Settings.setText("Read Settings")
+        self.actionRead_Settings.setEnabled(False)
 
         self.menuFile.addAction(self.actionRead_Settings)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
-        self.menuSerial_Ports.addAction(self.actionNull)
+        self.menuSerial_Ports.addAction(self.actionRescanSerial)
         self.menuSerial_Ports.addSeparator()
         self.menuConfiguration.addAction(self.menuSerial_Ports.menuAction())
+
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuConfiguration.menuAction())
 
@@ -76,9 +92,7 @@ class matrix(QtGui.QMainWindow):
         self.menuFile.setTitle("File")
         self.menuConfiguration.setTitle("Configuration")
         self.menuSerial_Ports.setTitle("Serial Ports")
-        self.actionQuit.setText("Quit")
-        self.actionNull.setText("Rescan")
-        self.actionRead_Settings.setText("Read Settings")
+
 
         self.setupDynamicUI()
     def setupDynamicUI(self):
@@ -110,7 +124,7 @@ class matrix(QtGui.QMainWindow):
                 outgroup.buttonClicked.connect(self.clickedRouting)
                 #print("connected %s for %s" % (outgroup, butn))
 
-        
+
     def clickedRouting(self, btn):
         btngrp=btn.group()
         innum=btngrp.checkedId()
@@ -127,12 +141,50 @@ class matrix(QtGui.QMainWindow):
         print("connecting: %s -> %s" % (innum, outnum))
 
     def rescanSerial(self):
+        lastselected=""
+        for (name, action) in self.serialPorts:
+            if action.isChecked():
+                lastselected=name
+            self.menuSerial_Ports.removeAction(action)
+            self.serialSelections.removeAction(action)
+        self.serialPorts=[]
         import serial.tools.list_ports
-        ports=serial.tools.list_ports.comports()
-        for p in ports:
-            print("p=%s" % (p[0],))
-        
-    
+        for (port_name,port_desc,_) in serial.tools.list_ports.comports():
+            action=QtGui.QAction(self)
+            action.setText(port_name)
+            action.setToolTip(port_desc)
+            action.setCheckable(True);
+            action.setActionGroup(self.serialSelections);
+
+            if lastselected and lastselected == port_name:
+                action.setChecked(True)
+                lastselected=None
+
+            self.menuSerial_Ports.addAction(action)
+            self.serialPorts+=[(port_name, action)]
+
+        # finally activate the correct selection
+        if lastselected is not None:
+            ## this means that we were not able to continue with the old selection
+            ## so just choose the first one available
+            acts=self.serialSelections.actions()
+            if acts:
+                acts[0].setChecked(True)
+                self.selectSerial()
+
+    def selectSerial(self):
+        for (name,action) in self.serialPorts:
+            if action.isChecked():
+                print("selected serial port: %s" % (name))
+                self.serial=serial.Serial(name)
+                time.sleep(1)
+
+
+
+    def exit(self):
+        import sys
+        sys.exit()
+
 if __name__ == '__main__':
     import sys
     app = QtGui.QApplication(sys.argv)
