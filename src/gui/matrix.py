@@ -54,12 +54,11 @@ class matrix(QtGui.QMainWindow, matrix_ui.Ui_MainWindow):
                 outgroup.addButton(butn)
                 outgroup.setId(butn, innum)
                 butn.setToolTip("%s -> %s" % (input, output))
-                outgroup.buttonClicked.connect(self.clickedConnection)
+                outgroup.buttonClicked.connect(self.clickedRouting)
                 #print("connected %s for %s" % (outgroup, butn))
-        
 
         
-    def clickedConnection(self, btn):
+    def clickedRouting(self, btn):
         btngrp=btn.group()
         innum=btngrp.checkedId()
         outnum=-1
