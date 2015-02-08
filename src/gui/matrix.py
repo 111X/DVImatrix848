@@ -42,7 +42,7 @@ class matrix(QtGui.QMainWindow):
         self.rescanSerial()
 
     def setupUI(self):
-        #self.resize(168, 146)
+        self.resize(320, 240)
         self.centralwidget = QtGui.QWidget(self)
         self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
         self.groupBox = QtGui.QGroupBox(self.centralwidget)
