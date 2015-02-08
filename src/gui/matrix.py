@@ -119,7 +119,7 @@ class matrix(QtGui.QMainWindow):
             #outlabel.setObjectName(output)
             self.gridLayout.addWidget(outlabel, 0, 1+outnum, 1, 1)
             outlabel.setText(output)
-            self.out4in+=[-1]
+            self.out4in+=[None]
 
             for innum, input in enumerate(inputs):
                 butn=QtGui.QRadioButton(self.groupBox)
