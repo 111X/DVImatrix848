@@ -145,7 +145,7 @@ class matrix(QtGui.QMainWindow):
 
     def routeInput2Output(self, innum, outnum):
         self.out4in[outnum]=innum
-        print("connecting: %s -> %s" % (innum, outnum))
+        print("TODO: connect: %s -> %s" % (innum, outnum))
 
     def rescanSerial(self):
         lastselected=""
