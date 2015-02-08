@@ -177,8 +177,11 @@ class matrix(QtGui.QMainWindow):
         for (name,action) in self.serialPorts:
             if action.isChecked():
                 print("selected serial port: %s" % (name))
-                self.serial=serial.Serial(name)
-                time.sleep(1)
+                try:
+                    self.serial=serial.Serial(name)
+                    time.sleep(1)
+                except serial.serialutil.SerialException as e:
+                    self.statusBar().showMessage("ERROR: %s" % (e))
 
 
 
