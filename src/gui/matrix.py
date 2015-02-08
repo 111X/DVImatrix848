@@ -193,6 +193,7 @@ class matrix(QtGui.QMainWindow):
 
 
     def exit(self):
+        self.writeConfig('foo.ini')
         import sys
         sys.exit()
     def readConfig(self, configfile=None):
