@@ -189,6 +189,52 @@ class matrix(QtGui.QMainWindow):
     def exit(self):
         import sys
         sys.exit()
+    def readConfig(self, configfile=None):
+        if not configfile:
+            configfile=self.configfile
+        if not configfile:
+            configfile='HDMImatrix.ini'
+        config = ConfigParser.SafeConfigParser(allow_no_value=True)
+        config.read(configfile)
+        if not config.has_section('INPUTS'):
+            self.statusBar().showMessage("WARNING: no 'INPUTS' section in configuration %s" % (configfile))
+            config.add_section('INPUTS')
+        if not config.options('INPUTS'):
+            self.statusBar().showMessage("WARNING: no inputs in 'INPUTS' section in configuration %s" % (configfile))
+            for i in range(4):
+                config.set('INPUTS', ('in#%d' % (i+1)), None)
+        self.inputs=config.options('INPUTS')
+        if not config.has_section('OUTPUTS'):
+            self.statusBar().showMessage("WARNING: no 'OUTPUTS' section in configuration %s" % (configfile))
+            config.add_section('OUTPUTS')
+        if not config.options('OUTPUTS'):
+            self.statusBar().showMessage("WARNING: no outputs in 'OUTPUTS' section in configuration %s" % (configfile))
+            for i in range(4):
+                config.set('OUTPUTS', ('out#%d' % (i+1)), None)
+        self.outputs=config.options('OUTPUTS')
+
+        self.config=config
+        self.configfile=configfile
+    def writeConfig(self, configfile=None):
+        if not configfile:
+            configfile=self.configfile
+        if not configfile:
+            configfile='HDMImatrix.ini'
+        self.configfile=configfile
+        config = ConfigParser.SafeConfigParser(allow_no_value=True)
+
+        config.add_section('serial')
+        if self.serial and self.serial.portstr:
+            config.set('serial', 'port', self.serial.portstr)
+        config.add_section('INPUTS')
+        for i in self.inputs:
+            config.set('INPUTS', i, None)
+        config.add_section('OUTPUTS')
+        for o in self.outputs:
+            config.set('OUTPUTS', o, None)
+
+        with open(configfile, 'wb') as cf:
+            config.write(cf)
 
 if __name__ == '__main__':
     import sys
