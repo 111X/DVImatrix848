@@ -36,7 +36,7 @@ class matrix(QtGui.QMainWindow):
         self.configfile=None
 
         self.outgroup=[]
-        self.out4in=[]
+        self.out4in={}
         self.serialPorts=[] # array of name/menuitem pais
 
         self.serialSelections= QtGui.QActionGroup(self)
@@ -119,7 +119,6 @@ class matrix(QtGui.QMainWindow):
             #outlabel.setObjectName(output)
             self.gridLayout.addWidget(outlabel, 0, 1+outnum, 1, 1)
             outlabel.setText(output)
-            self.out4in+=[None]
 
             for innum, input in enumerate(inputs):
                 butn=QtGui.QRadioButton(self.groupBox)
@@ -140,7 +139,7 @@ class matrix(QtGui.QMainWindow):
             if og is btngrp:
                 outnum=on
                 break
-        if self.out4in[outnum] != innum:
+        if (not outnum in self.out4in) or (self.out4in[outnum] != innum):
             self.routeInput2Output(innum, outnum)
 
     def routeInput2Output(self, innum, outnum):
