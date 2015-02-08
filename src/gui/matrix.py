@@ -64,6 +64,7 @@ class matrix(QtGui.QMainWindow):
 
         self.actionQuit = QtGui.QAction(self)
         self.actionQuit.setText("Quit")
+        self.actionQuit.setShortcut("Ctrl+Q")
         self.actionQuit.activated.connect(self.exit)
 
         self.actionRescanSerial = QtGui.QAction(self)
