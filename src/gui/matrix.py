@@ -22,6 +22,8 @@ from PySide import QtGui, QtCore
 import serial
 import time
 
+import ConfigParser
+
 class matrix(QtGui.QMainWindow):
     def __init__(self,
                  inputs=["IN1", "IN2", "IN3", "foo", "bar"],
