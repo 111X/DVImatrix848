@@ -26,12 +26,14 @@ import ConfigParser
 
 class matrix(QtGui.QMainWindow):
     def __init__(self,
-                 inputs=["IN1", "IN2", "IN3", "foo", "bar"],
-                 outputs=["OUT1", "OUT2", "OUT3","OUT4"],
+                 configfile='HDMImatrix.ini'
                  ):
         super(matrix, self).__init__()
-        self.inputs=inputs
-        self.outputs=outputs
+        self.serial=None
+
+        self.inputs=[]
+        self.outputs=[]
+        self.configfile=None
 
         self.outgroup=[]
         self.out4in=[]
@@ -39,6 +41,8 @@ class matrix(QtGui.QMainWindow):
 
         self.serialSelections= QtGui.QActionGroup(self)
         self.serialSelections.triggered.connect(self.selectSerial)
+
+        self.readConfig()
 
         self.setupUI()
         self.rescanSerial()
