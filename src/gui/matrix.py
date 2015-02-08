@@ -154,6 +154,7 @@ class matrix(QtGui.QMainWindow):
             action=QtGui.QAction(self)
             action.setText(port_name)
             action.setToolTip(port_desc)
+            action.setStatusTip("Use serial port: %s" % (port_desc))
             action.setCheckable(True);
             action.setActionGroup(self.serialSelections);
 
