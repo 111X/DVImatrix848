@@ -230,12 +230,17 @@ class matrix(QtGui.QMainWindow):
         config = ConfigParser.SafeConfigParser(allow_no_value=True)
 
         config.add_section('serial')
+        config.set('serial', '# serial-port settings')
         if self.serial and self.serial.portstr:
             config.set('serial', 'port', self.serial.portstr)
         config.add_section('INPUTS')
+        config.set('INPUTS', '# list of inputs (one per line)')
+        config.set('INPUTS', '#   MUST NOT contain "=" (equal sign)')
         for i in self.inputs:
             config.set('INPUTS', i, None)
         config.add_section('OUTPUTS')
+        config.set('OUTPUTS', '# list of outputs (one per line)')
+        config.set('OUTPUTS', '#   MUST NOT contain "=" (equal sign)')
         for o in self.outputs:
             config.set('OUTPUTS', o, None)
 
