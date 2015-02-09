@@ -16,7 +16,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with HDMImatrix.  If not, see <http://www.gnu.org/licenses/>.
+# along with DVImatrix848.  If not, see <http://www.gnu.org/licenses/>.
 from PySide import QtGui, QtCore
 
 import serial
@@ -26,7 +26,7 @@ import ConfigParser
 
 class matrix(QtGui.QMainWindow):
     def __init__(self,
-                 configfile='HDMImatrix.ini'
+                 configfile='DVImatrix848.ini'
                  ):
         super(matrix, self).__init__()
         self.serial=None
@@ -95,7 +95,7 @@ class matrix(QtGui.QMainWindow):
         self.setStatusBar(self.statusbar)
 
         self.setWindowTitle("MainWindow")
-        self.groupBox.setTitle("HDMImatrix")
+        self.groupBox.setTitle("DVImatrix848")
         self.menuFile.setTitle("File")
         self.menuConfiguration.setTitle("Configuration")
         self.menuSerial_Ports.setTitle("Serial Ports")
@@ -199,7 +199,7 @@ class matrix(QtGui.QMainWindow):
         if not configfile:
             configfile=self.configfile
         if not configfile:
-            configfile='HDMImatrix.ini'
+            configfile='DVImatrix848.ini'
         config = ConfigParser.SafeConfigParser(allow_no_value=True)
         config.read(configfile)
         if not config.has_section('INPUTS'):
@@ -225,7 +225,7 @@ class matrix(QtGui.QMainWindow):
         if not configfile:
             configfile=self.configfile
         if not configfile:
-            configfile='HDMImatrix.ini'
+            configfile='DVImatrix848.ini'
         self.configfile=configfile
         config = ConfigParser.SafeConfigParser(allow_no_value=True)
 
