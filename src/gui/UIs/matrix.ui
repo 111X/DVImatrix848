@@ -58,7 +58,7 @@
      <property name="title">
       <string>Serial Ports</string>
      </property>
-     <addaction name="actionNull"/>
+     <addaction name="actionRescan"/>
      <addaction name="separator"/>
     </widget>
     <addaction name="menuSerial_Ports"/>
@@ -71,10 +71,16 @@
    <property name="text">
     <string>Quit</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
   </action>
-  <action name="actionNull">
+  <action name="actionRescan">
    <property name="text">
     <string>Rescan</string>
+   </property>
+   <property name="statusTip">
+    <string>rescan status</string>
    </property>
   </action>
   <action name="actionRead_Settings">
