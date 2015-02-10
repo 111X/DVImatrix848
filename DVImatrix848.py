@@ -209,8 +209,6 @@ class DVImatrix848(QtGui.QMainWindow):
             inlabel.setText(input)
 
         for outnum, output in enumerate(outputs):
-            outgroup=QtGui.QButtonGroup(self.groupBox)
-            self.outgroup+=[outgroup]
             if not enable:
                 outlabel = QtGui.QLabel(self.groupBox)
             else:
