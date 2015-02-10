@@ -24,11 +24,11 @@ import time
 
 import ConfigParser
 
-class matrix(QtGui.QMainWindow):
+class DVImatrix848(QtGui.QMainWindow):
     def __init__(self,
                  configfile='DVImatrix848.ini'
                  ):
-        super(matrix, self).__init__()
+        super(DVImatrix848, self).__init__()
         self.serial=None
 
         self.inputs=[]
@@ -250,7 +250,7 @@ class matrix(QtGui.QMainWindow):
 if __name__ == '__main__':
     import sys
     app = QtGui.QApplication(sys.argv)
-    window = matrix()
+    window = DVImatrix848()
     window.show()
     # Run the main Qt loop
     sys.exit(app.exec_())
