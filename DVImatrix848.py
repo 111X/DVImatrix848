@@ -24,6 +24,18 @@ import time
 
 import ConfigParser
 
+
+def getConfigFile():
+    import os
+    if os.name == "nt":
+        from win32com.shell import shellcon, shell
+        appdatadir=os.path.join(shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0),
+                                "DVImatrix848")
+    else:
+        appdatadir = os.path.join(os.path.expanduser("~"), ".config", "DVImatrix848")
+    if not os.path.isdir(appdatadir):
+        os.mkdir(appdatadir)
+    return os.path.join(appdatadir, "setup.ini")
 class DVImatrix848(QtGui.QMainWindow):
     def __init__(self,
                  configfile='DVImatrix848.ini'
