@@ -333,6 +333,7 @@ class DVImatrix848(QtGui.QMainWindow):
                 print("selected serial port: %s" % (name))
                 try:
                     self.comm.connect(name)
+                    self.getMatrix()
                 except serial.serialutil.SerialException as e:
                     self.statusBar().showMessage("ERROR: %s" % (e))
                     action.setChecked(False)
