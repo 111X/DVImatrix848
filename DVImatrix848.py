@@ -143,6 +143,7 @@ class DVImatrix848(QtGui.QMainWindow):
 
         self.actionEditLabels = QtGui.QAction(self)
         self.actionEditLabels.setText("Edit Labels")
+        self.actionEditLabels.setShortcut("Ctrl+E")
         self.actionEditLabels.setEnabled(True)
         self.actionEditLabels.setCheckable(True)
         self.actionEditLabels.activated.connect(self.editLabels)
