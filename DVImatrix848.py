@@ -128,6 +128,8 @@ class DVImatrix848(QtGui.QMainWindow):
         self.setupUI()
         self.rescanSerial()
 
+        self.getMatrix()
+
     def setupUI(self):
         self.resize(320, 240)
         self.centralwidget = QtGui.QWidget(self)
