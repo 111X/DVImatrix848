@@ -47,7 +47,7 @@ class communicator(object):
         ## 'readback' controls a subsequent 'read' operation
         ## - positive ints:
         print("TODO: write '%s'" % (data))
-        return
+        #return
 
         ## send data to the device
         ## will block if we have just opened the device
