@@ -272,7 +272,7 @@ class DVImatrix848(QtGui.QMainWindow):
                 og.setExclusive(True);
         for o in routes:
             i=routes[o]
-            print("input[%s] -> output[%s]" % (i,o))
+            #print("input[%s] -> output[%s]" % (i,o))
             buttons=self.outgroup[o].buttons()
             buttons[i].setChecked(True)
 
@@ -330,7 +330,7 @@ class DVImatrix848(QtGui.QMainWindow):
     def selectSerial(self):
         for (name,action) in self.serialPorts:
             if action.isChecked():
-                print("selected serial port: %s" % (name))
+                #print("selected serial port: %s" % (name))
                 try:
                     self.comm.connect(name)
                     self.getMatrix()
