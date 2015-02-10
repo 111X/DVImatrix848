@@ -71,7 +71,11 @@ class communicator(object):
         ## connects to another device
         ## if we cannot connect, this throws an exception
         self.connectTime=None
-        self.serial=serial.Serial(device)
+        self.serial=serial.Serial(port=device,
+                                  baudrate=19200, bytesize=8, parity='N', stopbits=1,
+                                  timeout=10 ## untested
+                                  )
+        self.serial.flowControl(False)
         self.connectTime=time.time()
     def getConnection(self):
         ## gets the name of the current connection
