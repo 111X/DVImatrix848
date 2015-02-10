@@ -76,7 +76,9 @@ class communicator(object):
         ## might block
         if not self.serial:
                 return None
-        pass
+        command=chr(65+output)
+        command+=('%s' % (1+input))
+        self.send(command)
     def getRoutes(self):
         ## gets all outputs with their selected inputs (as a dictionary)
         ## might block
