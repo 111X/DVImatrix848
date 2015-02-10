@@ -90,6 +90,7 @@ class communicator(object):
                 return None
         command=chr(65+output)
         command+=('%s' % (1+input))
+        command+='\r'
         self.send(command)
     def getRoutes(self):
         ## gets all outputs with their selected inputs (as a dictionary)
