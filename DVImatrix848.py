@@ -97,8 +97,10 @@ class communicator(object):
         ## might block
         if not self.serial:
                 return None
-        res=dict()
-        return res
+        command='#PRRS\r'
+        res=self.send(command)
+        d=dict()
+        return d
 
 
 class DVImatrix848(QtGui.QMainWindow):
