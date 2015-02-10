@@ -137,15 +137,18 @@ class DVImatrix848(QtGui.QMainWindow):
         self.actionRescanSerial.setText("Rescan")
         self.actionRescanSerial.activated.connect(self.rescanSerial)
 
-        self.actionRead_Settings = QtGui.QAction(self)
-        self.actionRead_Settings.setText("Read Settings")
-        self.actionRead_Settings.setEnabled(False)
+        self.actionEditLabels = QtGui.QAction(self)
+        self.actionEditLabels.setText("Edit Labels")
+        self.actionEditLabels.setEnabled(True)
+        self.actionEditLabels.setCheckable(True)
+        self.actionEditLabels.activated.connect(self.editLabels)
 
-        self.menuFile.addAction(self.actionRead_Settings)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
         self.menuSerial_Ports.addAction(self.actionRescanSerial)
         self.menuSerial_Ports.addSeparator()
+
+        self.menuConfiguration.addAction(self.actionEditLabels)
         self.menuConfiguration.addAction(self.menuSerial_Ports.menuAction())
 
         self.menubar.addAction(self.menuFile.menuAction())
@@ -165,20 +168,13 @@ class DVImatrix848(QtGui.QMainWindow):
     def setupDynamicUI(self):
         inputs=self.inputs
         outputs=self.outputs
+        self.outgroup=[]
 
-        for innum, input in enumerate(inputs):
-            inlabel = QtGui.QLabel(self.groupBox)
-            #inlabel.setObjectName(input)
-            self.gridLayout.addWidget(inlabel, 1+innum, 0, 1, 1)
-            inlabel.setText(input)
+        self.enableLabelEditing(False)
 
         for outnum, output in enumerate(outputs):
             outgroup=QtGui.QButtonGroup(self.groupBox)
             self.outgroup+=[outgroup]
-            outlabel = QtGui.QLabel(self.groupBox)
-            #outlabel.setObjectName(output)
-            self.gridLayout.addWidget(outlabel, 0, 1+outnum, 1, 1)
-            outlabel.setText(output)
 
             for innum, input in enumerate(inputs):
                 butn=QtGui.QRadioButton(self.groupBox)
@@ -189,7 +185,37 @@ class DVImatrix848(QtGui.QMainWindow):
                 butn.setToolTip("%s -> %s" % (input, output))
                 outgroup.buttonClicked.connect(self.clickedRouting)
                 #print("connected %s for %s" % (outgroup, butn))
+    def _replaceWidget(self, wdg, row, col):
+        oldwdgitm=self.gridLayout.itemAtPosition(row, col)
+        if oldwdgitm:
+            oldwdg=oldwdgitm.widget()
+            self.gridLayout.removeWidget(oldwdg)
+            oldwdg.deleteLater()
+        self.gridLayout.addWidget(wdg, row, col, 1, 1)
 
+    def enableLabelEditing(self, enable=True):
+        inputs=self.inputs
+        outputs=self.outputs
+        for innum, input in enumerate(inputs):
+            if not enable:
+                inlabel = QtGui.QLabel(self.groupBox)
+            else:
+                inlabel = QtGui.QLineEdit(self.groupBox)
+            self._replaceWidget(inlabel, 1+innum, 0)
+            inlabel.setText(input)
+
+        for outnum, output in enumerate(outputs):
+            outgroup=QtGui.QButtonGroup(self.groupBox)
+            self.outgroup+=[outgroup]
+            if not enable:
+                outlabel = QtGui.QLabel(self.groupBox)
+            else:
+                outlabel = QtGui.QLineEdit(self.groupBox)
+            self._replaceWidget(outlabel, 0, 1+outnum)
+            outlabel.setText(output)
+    def editLabels(self):
+        state=self.actionEditLabels.isChecked()
+        self.enableLabelEditing(state)
 
     def clickedRouting(self, btn):
         btngrp=btn.group()
