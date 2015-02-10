@@ -5,7 +5,14 @@ simple control program for the [Gefen EXT-DVI-848](http://www.gefen.com/kvm/ext-
 ##Gefen EXT-DVI-848
 Documentation about the device can be found at http://www.gefen.com/pdf/EXT-DVI-848.pdf
 
-The interesting parts (commands to control the device via the serial line) can be found in *Appendix B*:
+The interesting parts (commands to control the device via the serial line) can be found in *Appendix B*.
+
+###RS232 settings
+- Bits per second: 19200
+- Data bits: 8
+- Parity: None
+- Stop bits: 1
+- Flow Control: None
 
 ###Switching Command (shortcut)
 First character indicates the output monitor. Second character indicates the input
