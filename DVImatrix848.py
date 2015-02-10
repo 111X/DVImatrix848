@@ -215,6 +215,22 @@ class DVImatrix848(QtGui.QMainWindow):
             outlabel.setText(output)
     def editLabels(self):
         state=self.actionEditLabels.isChecked()
+        if not state:
+            newouts=[]
+            for idx, _ in enumerate(self.outputs):
+                itm=self.gridLayout.itemAtPosition(0, idx+1)
+                if itm and itm.widget():
+                    wdg=itm.widget()
+                    newouts+=[wdg.text()]
+            newins=[]
+            for idx, _ in enumerate(self.inputs):
+                itm=self.gridLayout.itemAtPosition(idx+1, 0)
+                if itm and itm.widget():
+                    wdg=itm.widget()
+                    newins+=[wdg.text()]
+            self.inputs=newins
+            self.outputs=newouts
+
         self.enableLabelEditing(state)
 
     def clickedRouting(self, btn):
