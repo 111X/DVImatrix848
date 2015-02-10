@@ -36,6 +36,52 @@ def getConfigFile():
     if not os.path.isdir(appdatadir):
         os.mkdir(appdatadir)
     return os.path.join(appdatadir, "setup.ini")
+
+class communicator(object):
+    def __init__(self):
+        super(communicator, self).__init__()
+        self.serial=None
+        self.connectTime=None
+
+    def _send(self, data):
+        ## send data to the device
+        ## will block if we have just opened the device
+        if not self.serial or not self.connectTime:
+                return None
+        sleeptime=time.time() + 1 - self.connectTime
+        if sleeptime > 0:
+                time.sleep(sleeptime)
+        self.serial.write(data)
+        self.serial.flush()
+
+
+    def connect(self, device):
+        ## connects to another device
+        ## if we cannot connect, this throws an exception
+        self.connectTime=None
+        self.serial=serial.Serial(device)
+        self.connectTime=time.time()
+    def getConnection(self):
+        ## gets the name of the current connection
+        ## returns None if there is no open connection
+        if self.serial and self.serial.portstr:
+            return self.serial.portstr
+        return None
+    def route(self, input, output):
+        ## tells the matrix to choose 'input' as an input for 'output'
+        ## might block
+        if not self.serial:
+                return None
+        pass
+    def getRoutes(self):
+        ## gets all outputs with their selected inputs (as a dictionary)
+        ## might block
+        if not self.serial:
+                return None
+        res=dict()
+        return res
+
+
 class DVImatrix848(QtGui.QMainWindow):
     def __init__(self,
                  configfile=None
