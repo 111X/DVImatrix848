@@ -100,6 +100,10 @@ class communicator(object):
         command='#PRRS\r'
         res=self.send(command)
         d=dict()
+        ## dummy data
+        d[0]=0
+        d[2]=3
+
         return d
 
 
