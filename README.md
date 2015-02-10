@@ -1,6 +1,6 @@
 # DVImatrix848
 
-simple control program for the *Gefen EXT-DVI-848*, an 8x8 matrix for routing DVI-signals.
+simple control program for the [Gefen EXT-DVI-848](http://www.gefen.com/kvm/ext-dvi-848.jsp?prod_id=5311), an 8x8 routing matrix for DVI-signals.
 
 ##Gefen EXT-DVI-848
 Documentation about the device can be found at http://www.gefen.com/pdf/EXT-DVI-848.pdf
