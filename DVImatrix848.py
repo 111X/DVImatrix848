@@ -183,6 +183,9 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menuConfiguration.setTitle("Configuration")
         self.menuSerial_Ports.setTitle("Serial Ports")
 
+        self.matrixButton = QtGui.QPushButton("Get State")
+        self.matrixButton.clicked.connect(self.getMatrix)
+        self.gridLayout.addWidget(self.matrixButton, 0,0,1,1)
 
         self.setupDynamicUI()
     def setupDynamicUI(self):
@@ -250,6 +253,18 @@ class DVImatrix848(QtGui.QMainWindow):
             self.outputs=newouts
 
         self.enableLabelEditing(state)
+    def getMatrix(self):
+        routes=self.comm.getRoutes()
+        #print("got matrix: %s" % (routes))
+        for og in self.outgroup:
+            btn = og.checkedButton()
+            if btn:
+                og.setExclusive(False);
+                btn.setChecked(False)
+                og.setExclusive(True);
+        for o,i in enumerate(routes):
+            buttons=self.outgroup[o].buttons()
+            buttons[i].setChecked(True)
 
     def clickedRouting(self, btn):
         btngrp=btn.group()
