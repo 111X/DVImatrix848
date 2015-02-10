@@ -54,7 +54,7 @@ class communicator(object):
 
         if not self.serial or not self.connectTime:
                 return None
-        sleeptime=time.time() + 1 - self.connectTime
+        sleeptime=self.connectTime + 1 - time.time()
         if sleeptime > 0:
                 time.sleep(sleeptime)
         self.serial.write(data)
