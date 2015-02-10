@@ -242,7 +242,9 @@ class DVImatrix848(QtGui.QMainWindow):
         btngrp=btn.group()
         innum=btngrp.checkedId()
         outnum=-1
+        #print("outgroup: %s" % (self.outgroup))
         for on,og in enumerate(self.outgroup):
+            #print("out[%s]=%s" % (on, og))
             if og is btngrp:
                 outnum=on
                 break
@@ -251,8 +253,8 @@ class DVImatrix848(QtGui.QMainWindow):
 
     def routeInput2Output(self, innum, outnum):
         self.out4in[outnum]=innum
-        print("TODO: connect: %s -> %s" % (innum, outnum))
         self.comm.route(innum, outnum)
+        #print("TODO: connect: %s -> %s" % (innum, outnum))
 
     def rescanSerial(self):
         lastselected=""
