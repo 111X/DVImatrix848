@@ -43,7 +43,9 @@ class communicator(object):
         self.serial=None
         self.connectTime=None
 
-    def send(self, data):
+    def send(self, data, readback=None):
+        ## 'readback' controls a subsequent 'read' operation
+        ## - positive ints:
         print("TODO: write '%s'" % (data))
         return
 
@@ -56,8 +58,14 @@ class communicator(object):
         if sleeptime > 0:
                 time.sleep(sleeptime)
         self.serial.write(data)
-        self.serial.flush()
-
+        self.serial.flush() ## untested
+        if readback is None:
+            return None
+        if readback is True:
+            return ser.readline()
+        if int(readback) > 0:
+            return ser.read(int(readback))
+        return None
 
     def connect(self, device):
         ## connects to another device
