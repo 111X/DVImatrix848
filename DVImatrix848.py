@@ -43,9 +43,13 @@ class communicator(object):
         self.serial=None
         self.connectTime=None
 
-    def _send(self, data):
+    def send(self, data):
+        print("TODO: write '%s'" % (data))
+        return
+
         ## send data to the device
         ## will block if we have just opened the device
+
         if not self.serial or not self.connectTime:
                 return None
         sleeptime=time.time() + 1 - self.connectTime
