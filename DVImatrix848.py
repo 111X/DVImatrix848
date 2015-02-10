@@ -252,6 +252,7 @@ class DVImatrix848(QtGui.QMainWindow):
     def routeInput2Output(self, innum, outnum):
         self.out4in[outnum]=innum
         print("TODO: connect: %s -> %s" % (innum, outnum))
+        self.comm.route(innum, outnum)
 
     def rescanSerial(self):
         lastselected=""
