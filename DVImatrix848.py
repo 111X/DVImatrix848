@@ -38,9 +38,11 @@ def getConfigFile():
     return os.path.join(appdatadir, "setup.ini")
 class DVImatrix848(QtGui.QMainWindow):
     def __init__(self,
-                 configfile='DVImatrix848.ini'
+                 configfile=None
                  ):
         super(DVImatrix848, self).__init__()
+        if configfile is None:
+            configfile=getConfigFile()
         self.serial=None
 
         self.inputs=[]
@@ -54,7 +56,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.serialSelections= QtGui.QActionGroup(self)
         self.serialSelections.triggered.connect(self.selectSerial)
 
-        self.readConfig()
+        self.readConfig(configfile)
 
         self.setupUI()
         self.rescanSerial()
@@ -204,7 +206,7 @@ class DVImatrix848(QtGui.QMainWindow):
 
 
     def exit(self):
-        self.writeConfig('foo.ini')
+        self.writeConfig()
         import sys
         sys.exit()
     def readConfig(self, configfile=None):
