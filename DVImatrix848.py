@@ -264,7 +264,9 @@ class DVImatrix848(QtGui.QMainWindow):
                 og.setExclusive(False);
                 btn.setChecked(False)
                 og.setExclusive(True);
-        for o,i in enumerate(routes):
+        for o in routes:
+            i=routes[o]
+            print("input[%s] -> output[%s]" % (i,o))
             buttons=self.outgroup[o].buttons()
             buttons[i].setChecked(True)
 
