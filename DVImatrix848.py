@@ -89,7 +89,7 @@ class DVImatrix848(QtGui.QMainWindow):
         super(DVImatrix848, self).__init__()
         if configfile is None:
             configfile=getConfigFile()
-        self.serial=None
+        self.comm=communicator()
 
         self.inputs=[]
         self.outputs=[]
@@ -244,11 +244,11 @@ class DVImatrix848(QtGui.QMainWindow):
             if action.isChecked():
                 print("selected serial port: %s" % (name))
                 try:
-                    self.serial=serial.Serial(name)
-                    time.sleep(1)
+                    self.comm.connect(name)
                 except serial.serialutil.SerialException as e:
                     self.statusBar().showMessage("ERROR: %s" % (e))
-
+                    action.setChecked(False)
+                break
 
 
     def exit(self):
@@ -291,8 +291,9 @@ class DVImatrix848(QtGui.QMainWindow):
 
         config.add_section('serial')
         config.set('serial', '# serial-port settings')
-        if self.serial and self.serial.portstr:
-            config.set('serial', 'port', self.serial.portstr)
+        portname=self.comm.getConnection()
+        if portname:
+            config.set('serial', 'port', portname)
         config.add_section('INPUTS')
         config.set('INPUTS', '# list of inputs (one per line)')
         config.set('INPUTS', '#   MUST NOT contain "=" (equal sign)')
