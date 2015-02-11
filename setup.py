@@ -26,6 +26,11 @@ import os
 
 
 if os.name == 'nt':
+    from glob import glob
+    data_files = [("Microsoft.VC90.CRT",
+                   glob(r'C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT\*.*'))]
     import py2exe
-    setup(windows=['DVImatrix848.py'])
+    setup(windows=['DVImatrix848.py'],
+          data_files=data_files,
+          )
     #setup(console=['DVImatrix848.py'])
