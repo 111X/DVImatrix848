@@ -70,6 +70,8 @@ class communicator(object):
     def connect(self, device):
         ## connects to another device
         ## if we cannot connect, this throws an exception
+        if device == self.getConnection():
+            return
         self.connectTime=None
         self.serial=serial.Serial(port=device,
                                   baudrate=19200, bytesize=8, parity='N', stopbits=1,
