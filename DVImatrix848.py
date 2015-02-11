@@ -115,7 +115,7 @@ class communicator(object):
         self.connectTime=None
         self.serial=serial.Serial(port=device,
                                   baudrate=19200, bytesize=8, parity='N', stopbits=1,
-                                  timeout=10 ## untested
+                                  timeout=1 ## untested
                                   )
         #self.serial.flowControl(False)
         self.connectTime=time.time()
