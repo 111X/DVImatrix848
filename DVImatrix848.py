@@ -151,7 +151,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.gridLayout = QtGui.QGridLayout(self.groupBox)
         self.label = QtGui.QLabel(self.groupBox)
         self.label.setText("")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.verticalLayout.addWidget(self.groupBox)
         self.setCentralWidget(self.centralwidget)
 
@@ -207,7 +207,7 @@ class DVImatrix848(QtGui.QMainWindow):
 
         self.matrixButton = QtGui.QPushButton("Get State")
         self.matrixButton.clicked.connect(self.getMatrix)
-        self.gridLayout.addWidget(self.matrixButton, 0,0,1,1)
+        self.gridLayout.addWidget(self.matrixButton, 0,0,1,1, QtCore.Qt.AlignCenter)
 
     def setupDynamicUI(self):
         inputs=self.inputs
@@ -223,7 +223,8 @@ class DVImatrix848(QtGui.QMainWindow):
             for innum, input in enumerate(inputs):
                 butn=QtGui.QRadioButton(self.groupBox)
                 butn.setText("")
-                self.gridLayout.addWidget(butn, 1+innum, 1+outnum, 1, 1)
+                self.gridLayout.addWidget(butn, 1+innum, 1+outnum, 1, 1, QtCore.Qt.AlignCenter
+                                          )
                 outgroup.addButton(butn)
                 outgroup.setId(butn, innum)
                 butn.setToolTip("%s -> %s" % (input, output))
@@ -236,7 +237,7 @@ class DVImatrix848(QtGui.QMainWindow):
             oldwdg=oldwdgitm.widget()
             self.gridLayout.removeWidget(oldwdg)
             oldwdg.deleteLater()
-        self.gridLayout.addWidget(wdg, row, col, 1, 1)
+        self.gridLayout.addWidget(wdg, row, col, 1, 1, QtCore.Qt.AlignCenter)
 
     def enableLabelEditing(self, enable=True):
         inputs=self.inputs
