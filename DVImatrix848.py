@@ -241,7 +241,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menuSerial_Ports.setTitle("Serial Ports")
 
         self.matrixButton = QtGui.QPushButton("Get State")
-        self.matrixButton.setEnabled(False)
+        #self.matrixButton.setEnabled(False)
         self.matrixButton.clicked.connect(self.getMatrix)
         self.gridLayout.addWidget(self.matrixButton, 0,0,1,1, QtCore.Qt.AlignCenter)
 
