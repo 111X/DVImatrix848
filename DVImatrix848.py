@@ -23,7 +23,7 @@ import serial
 import time
 
 import json
-
+from QtSingleApplication import QtSingleApplication
 
 def getConfigFile():
     import os
@@ -444,9 +444,16 @@ class DVImatrix848(QtGui.QMainWindow):
         self.statusBar().showMessage(text)
         print("STATE: %s" % text)
 if __name__ == '__main__':
+    ## the following is a pre-calculated type5 UUID
+    ## appGuid=str(uuid.uuid5(uuid.NAMESPACE_DNS, 'github.com/iem-projects/DVImatrix848'))
+    appGuid='78cf6144-49c4-5a01-ade8-db93316aff6c'
+
     import sys
-    app = QtGui.QApplication(sys.argv)
+    app = QtSingleApplication(appGuid, sys.argv)
+    if app.isRunning(): sys.exit(0)
+
     window = DVImatrix848()
+    app.setActivationWindow(window)
     window.show()
     # Run the main Qt loop
     sys.exit(app.exec_())
