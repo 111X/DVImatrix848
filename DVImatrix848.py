@@ -127,7 +127,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.serialPorts=[] # array of name/menuitem pais
 
         self.serialSelections= QtGui.QActionGroup(self)
-        self.serialSelections.triggered.connect(self.selectSerial)
+        self.serialSelections.triggered.connect(self.selectSerialByMenu)
 
         self.readConfig(configfile)
 
@@ -336,10 +336,15 @@ class DVImatrix848(QtGui.QMainWindow):
                 acts[0].setChecked(True)
                 self.selectSerial()
 
-    def selectSerial(self):
+    def selectSerial(self, portname=None):
+        print("selecting %s in %s" % (portname, [x for (x,y) in self.serialPorts]))
         for (name,action) in self.serialPorts:
-            if action.isChecked():
-                #print("selected serial port: %s" % (name))
+            if portname is None:
+                selected=action.isChecked()
+            else:
+                selected=(portname == name)
+            if selected:
+                print("selected serial port: %s" % (name))
                 try:
                     self.comm.connect(name)
                     self.getMatrix()
@@ -347,7 +352,8 @@ class DVImatrix848(QtGui.QMainWindow):
                     self.statusBar().showMessage("ERROR: %s" % (e))
                     action.setChecked(False)
                 break
-
+    def selectSerialByMenu(self):
+        return self.selectSerial()
 
     def exit(self):
         self.writeConfig()
