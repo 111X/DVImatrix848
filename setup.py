@@ -45,6 +45,5 @@ if os.name == 'nt':
     import py2exe
     setup(windows=['DVImatrix848.py'],
           data_files=data_files,
-          dll_excludes='MSVCP90.dll',
           )
     #setup(console=['DVImatrix848.py'])
