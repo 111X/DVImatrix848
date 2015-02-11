@@ -275,6 +275,8 @@ class DVImatrix848(QtGui.QMainWindow):
                 og.setExclusive(False);
                 btn.setChecked(False)
                 og.setExclusive(True);
+        if not routes:
+            return
         for o in routes:
             i=routes[o]
             #print("input[%s] -> output[%s]" % (i,o))
