@@ -125,14 +125,19 @@ class DVImatrix848(QtGui.QMainWindow):
         self.outgroup=[]
         self.out4in={}
         self.serialPorts=[] # array of name/menuitem pais
+        self.serialport=None
 
         self.serialSelections= QtGui.QActionGroup(self)
         self.serialSelections.triggered.connect(self.selectSerialByMenu)
 
+        self.setupStaticUI()
+
+        self.rescanSerial()
         self.readConfig(configfile)
 
-        self.setupUI()
-        self.rescanSerial()
+        self.setupDynamicUI()
+        if self.serialport:
+            self.selectSerial(self.serialport)
 
         self.getMatrix()
 
@@ -346,7 +351,10 @@ class DVImatrix848(QtGui.QMainWindow):
                 print("selected serial port: %s" % (name))
                 try:
                     self.comm.connect(name)
+                    action.setChecked(True)
                     self.getMatrix()
+                    self.statusBar().showMessage("serial port connected to %s" % (name))
+
                 except serial.serialutil.SerialException as e:
                     self.statusBar().showMessage("ERROR: %s" % (e))
                     action.setChecked(False)
@@ -392,8 +400,7 @@ class DVImatrix848(QtGui.QMainWindow):
 
         try:
             d=config['serial']
-            port=d['port']
-            self.selectSerial(port)
+            self.serialport=d['port']
         except (KeyError, TypeError) as e:
             self.statusBar().showMessage("WARNING: no 'serial' configuration %s" % (configfile))
 
