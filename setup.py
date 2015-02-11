@@ -40,6 +40,7 @@ if os.name == 'nt':
         if os.path.exists(os.path.join(p, 'msvcp90.dll')):
             data_files = [("Microsoft.VC90.CRT",
                            glob(r'%s\*.*' % p))]
+            sys.path.append(p)
             break
     import py2exe
     setup(windows=['DVImatrix848.py'],
