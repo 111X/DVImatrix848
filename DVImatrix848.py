@@ -263,10 +263,8 @@ class DVImatrix848(QtGui.QMainWindow):
                                           )
                 outgroup.addButton(butn)
                 outgroup.setId(butn, innum)
-                butn.setToolTip(u"%s → %s" % (input, output))
-                butn.setStatusTip(u"%s → %s" % (input, output))
                 outgroup.buttonClicked.connect(self.clickedRouting)
-                #print("connected %s for %s" % (outgroup, butn))
+        self._updateTooltips()
     def _updateTooltips(self):
         inputs=self.inputs
         outputs=self.outputs
@@ -304,6 +302,9 @@ class DVImatrix848(QtGui.QMainWindow):
                 outlabel = QtGui.QLineEdit(self.groupBox)
             self._replaceWidget(outlabel, 0, 1+outnum)
             outlabel.setText(output)
+        if not enable:
+            self._updateTooltips()
+
     def editLabels(self):
         state=self.actionEditLabels.isChecked()
         if not state:
