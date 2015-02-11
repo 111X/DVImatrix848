@@ -22,7 +22,7 @@ from PySide import QtGui, QtCore
 import serial
 import time
 
-import ConfigParser
+import json
 
 
 def getConfigFile():
@@ -35,7 +35,7 @@ def getConfigFile():
         appdatadir = os.path.join(os.path.expanduser("~"), ".config", "DVImatrix848")
     if not os.path.isdir(appdatadir):
         os.mkdir(appdatadir)
-    return os.path.join(appdatadir, "setup.ini")
+    return os.path.join(appdatadir, "setup.json")
 
 class communicator(object):
     def __init__(self):
@@ -54,7 +54,7 @@ class communicator(object):
 
         if not self.serial or not self.connectTime:
                 return None
-        sleeptime=time.time() + 1 - self.connectTime
+        sleeptime=self.connectTime + 1 - time.time()
         if sleeptime > 0:
                 time.sleep(sleeptime)
         self.serial.write(data)
@@ -70,6 +70,9 @@ class communicator(object):
     def connect(self, device):
         ## connects to another device
         ## if we cannot connect, this throws an exception
+        print("connecting to '%s' instead of '%s'" % (device, self.getConnection()))
+        if device == self.getConnection():
+            return
         self.connectTime=None
         self.serial=serial.Serial(port=device,
                                   baudrate=19200, bytesize=8, parity='N', stopbits=1,
@@ -77,6 +80,7 @@ class communicator(object):
                                   )
         #self.serial.flowControl(False)
         self.connectTime=time.time()
+        print("connected to '%s'" % self.getConnection())
     def getConnection(self):
         ## gets the name of the current connection
         ## returns None if there is no open connection
@@ -123,18 +127,23 @@ class DVImatrix848(QtGui.QMainWindow):
         self.outgroup=[]
         self.out4in={}
         self.serialPorts=[] # array of name/menuitem pais
+        self.serialport=None
 
         self.serialSelections= QtGui.QActionGroup(self)
-        self.serialSelections.triggered.connect(self.selectSerial)
+        self.serialSelections.triggered.connect(self.selectSerialByMenu)
 
+        self.setupStaticUI()
+
+        self.rescanSerial()
         self.readConfig(configfile)
 
-        self.setupUI()
-        self.rescanSerial()
+        self.setupDynamicUI()
+        if self.serialport:
+            self.selectSerial(self.serialport)
 
         self.getMatrix()
 
-    def setupUI(self):
+    def setupStaticUI(self):
         self.resize(320, 240)
         self.centralwidget = QtGui.QWidget(self)
         self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
@@ -200,7 +209,6 @@ class DVImatrix848(QtGui.QMainWindow):
         self.matrixButton.clicked.connect(self.getMatrix)
         self.gridLayout.addWidget(self.matrixButton, 0,0,1,1)
 
-        self.setupDynamicUI()
     def setupDynamicUI(self):
         inputs=self.inputs
         outputs=self.outputs
@@ -276,11 +284,18 @@ class DVImatrix848(QtGui.QMainWindow):
                 og.setExclusive(False);
                 btn.setChecked(False)
                 og.setExclusive(True);
+        if not routes:
+            return
+        print("routes=%s" % (routes))
+        print("outgroups=%s" % (len(self.outgroup)))
         for o in routes:
-            i=routes[o]
-            #print("input[%s] -> output[%s]" % (i,o))
-            buttons=self.outgroup[o].buttons()
-            buttons[i].setChecked(True)
+            try:
+                i=routes[o]
+                #print("input[%s] -> output[%s]" % (i,o))
+                buttons=self.outgroup[o].buttons()
+                buttons[i].setChecked(True)
+            except IndexError:
+                pass
 
     def clickedRouting(self, btn):
         btngrp=btn.group()
@@ -333,18 +348,27 @@ class DVImatrix848(QtGui.QMainWindow):
                 acts[0].setChecked(True)
                 self.selectSerial()
 
-    def selectSerial(self):
+    def selectSerial(self, portname=None):
+        print("selecting %s in %s" % (portname, [x for (x,y) in self.serialPorts]))
         for (name,action) in self.serialPorts:
-            if action.isChecked():
-                #print("selected serial port: %s" % (name))
+            if portname is None:
+                selected=action.isChecked()
+            else:
+                selected=(portname == name)
+            if selected:
+                print("selected serial port: %s" % (name))
                 try:
                     self.comm.connect(name)
+                    action.setChecked(True)
                     self.getMatrix()
+                    self.status("serial port connected to %s" % (name))
+
                 except serial.serialutil.SerialException as e:
-                    self.statusBar().showMessage("ERROR: %s" % (e))
+                    self.status("ERROR: %s" % (e))
                     action.setChecked(False)
                 break
-
+    def selectSerialByMenu(self):
+        return self.selectSerial()
 
     def exit(self):
         self.writeConfig()
@@ -354,55 +378,71 @@ class DVImatrix848(QtGui.QMainWindow):
         if not configfile:
             configfile=self.configfile
         if not configfile:
-            configfile='DVImatrix848.ini'
-        config = ConfigParser.SafeConfigParser(allow_no_value=True)
-        config.read(configfile)
-        if not config.has_section('INPUTS'):
-            self.statusBar().showMessage("WARNING: no 'INPUTS' section in configuration %s" % (configfile))
-            config.add_section('INPUTS')
-        if not config.options('INPUTS'):
-            self.statusBar().showMessage("WARNING: no inputs in 'INPUTS' section in configuration %s" % (configfile))
-            for i in range(4):
-                config.set('INPUTS', ('in#%d' % (i+1)), None)
-        self.inputs=config.options('INPUTS')
-        if not config.has_section('OUTPUTS'):
-            self.statusBar().showMessage("WARNING: no 'OUTPUTS' section in configuration %s" % (configfile))
-            config.add_section('OUTPUTS')
-        if not config.options('OUTPUTS'):
-            self.statusBar().showMessage("WARNING: no outputs in 'OUTPUTS' section in configuration %s" % (configfile))
-            for i in range(4):
-                config.set('OUTPUTS', ('out#%d' % (i+1)), None)
-        self.outputs=config.options('OUTPUTS')
+            configfile='DVImatrix848.json'
 
-        self.config=config
+        config=None
+        try:
+            with open(configfile, 'ro') as cf:
+                config=json.load(cf)
+        except (IOError, ValueError) as e:
+            self.status("WARNING: configfile error: %s" % (e))
+        if not config:
+            config={}
+        if not isinstance(config, dict):
+            self.status("ERROR: illegal configfile '%s'" % (configfile))
+
+        try:
+            x=config['INPUTS']
+            if isinstance(x, list):
+                self.inputs=x
+        except KeyError:
+            self.status("WARNING: no 'INPUTS' in configuration %s" % (configfile))
+            self.inputs=[ 'IN#%s' % x for x in range(8) ]
+        try:
+            x=config['OUTPUTS']
+            if isinstance(x, list):
+                self.outputs=x
+        except KeyError:
+            self.status("WARNING: no 'OUTPUTS' in configuration %s" % (configfile))
+            self.outputs=[ 'OUT#%s' % x for x in range(8) ]
+
+        try:
+            d=config['serial']
+            self.serialport=d['port']
+        except (KeyError, TypeError) as e:
+            self.status("WARNING: no 'serial' configuration %s" % (configfile))
+
+
         self.configfile=configfile
     def writeConfig(self, configfile=None):
         if not configfile:
             configfile=self.configfile
         if not configfile:
-            configfile='DVImatrix848.ini'
-        self.configfile=configfile
-        config = ConfigParser.SafeConfigParser(allow_no_value=True)
+            configfile='DVImatrix848.json'
 
-        config.add_section('serial')
-        config.set('serial', '# serial-port settings')
+
+        serialconf={}
+        d={}
         portname=self.comm.getConnection()
         if portname:
-            config.set('serial', 'port', portname)
-        config.add_section('INPUTS')
-        config.set('INPUTS', '# list of inputs (one per line)')
-        config.set('INPUTS', '#   MUST NOT contain "=" (equal sign)')
-        for i in self.inputs:
-            config.set('INPUTS', i, None)
-        config.add_section('OUTPUTS')
-        config.set('OUTPUTS', '# list of outputs (one per line)')
-        config.set('OUTPUTS', '#   MUST NOT contain "=" (equal sign)')
-        for o in self.outputs:
-            config.set('OUTPUTS', o, None)
+            serialconf['port']=portname
+        if serialconf:
+            d['serial']=serialconf
+        print("portname='%s'\nserialconf=%s\nconf=%s" % (portname, serialconf, d))
+
+        if self.inputs:
+            d['INPUTS']=self.inputs
+        if self.outputs:
+            d['OUTPUTS']=self.outputs
 
         with open(configfile, 'wb') as cf:
-            config.write(cf)
-
+            json.dump(d, cf,
+                      indent=4,
+                      ensure_ascii=True,
+            )
+    def status(self, text):
+        self.statusBar().showMessage(text)
+        print("STATE: %s" % text)
 if __name__ == '__main__':
     import sys
     app = QtGui.QApplication(sys.argv)
