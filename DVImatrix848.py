@@ -70,6 +70,7 @@ class communicator(object):
     def connect(self, device):
         ## connects to another device
         ## if we cannot connect, this throws an exception
+        print("connecting to '%s' instead of '%s'" % (device, self.getConnection()))
         if device == self.getConnection():
             return
         self.connectTime=None
@@ -79,6 +80,7 @@ class communicator(object):
                                   )
         #self.serial.flowControl(False)
         self.connectTime=time.time()
+        print("connected to '%s'" % self.getConnection())
     def getConnection(self):
         ## gets the name of the current connection
         ## returns None if there is no open connection
@@ -283,6 +285,8 @@ class DVImatrix848(QtGui.QMainWindow):
                 og.setExclusive(True);
         if not routes:
             return
+        print("routes=%s" % (routes))
+        print("outgroups=%s" % (len(self.outgroup)))
         for o in routes:
             try:
                 i=routes[o]
