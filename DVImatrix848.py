@@ -356,10 +356,10 @@ class DVImatrix848(QtGui.QMainWindow):
                     self.comm.connect(name)
                     action.setChecked(True)
                     self.getMatrix()
-                    self.statusBar().showMessage("serial port connected to %s" % (name))
+                    self.status("serial port connected to %s" % (name))
 
                 except serial.serialutil.SerialException as e:
-                    self.statusBar().showMessage("ERROR: %s" % (e))
+                    self.status("ERROR: %s" % (e))
                     action.setChecked(False)
                 break
     def selectSerialByMenu(self):
@@ -379,33 +379,33 @@ class DVImatrix848(QtGui.QMainWindow):
         try:
             with open(configfile, 'ro') as cf:
                 config=json.load(cf)
-        except (IOError, ValueError):
-            self.statusBar().showMessage("WARNING: no configfile '%s'" % (configfile))
+        except (IOError, ValueError) as e:
+            self.status("WARNING: configfile error: %s" % (e))
         if not config:
             config={}
         if not isinstance(config, dict):
-            self.statusBar().showMessage("ERROR: illegal configfile '%s'" % (configfile))
+            self.status("ERROR: illegal configfile '%s'" % (configfile))
 
         try:
             x=config['INPUTS']
             if isinstance(x, list):
                 self.inputs=x
         except KeyError:
-            self.statusBar().showMessage("WARNING: no 'INPUTS' in configuration %s" % (configfile))
+            self.status("WARNING: no 'INPUTS' in configuration %s" % (configfile))
             self.inputs=[ 'IN#%s' % x for x in range(8) ]
         try:
             x=config['OUTPUTS']
             if isinstance(x, list):
                 self.outputs=x
         except KeyError:
-            self.statusBar().showMessage("WARNING: no 'OUTPUTS' in configuration %s" % (configfile))
+            self.status("WARNING: no 'OUTPUTS' in configuration %s" % (configfile))
             self.outputs=[ 'OUT#%s' % x for x in range(8) ]
 
         try:
             d=config['serial']
             self.serialport=d['port']
         except (KeyError, TypeError) as e:
-            self.statusBar().showMessage("WARNING: no 'serial' configuration %s" % (configfile))
+            self.status("WARNING: no 'serial' configuration %s" % (configfile))
 
 
         self.configfile=configfile
@@ -435,7 +435,9 @@ class DVImatrix848(QtGui.QMainWindow):
                       indent=4,
                       ensure_ascii=True,
             )
-
+    def status(self, text):
+        self.statusBar().showMessage(text)
+        print("STATE: %s" % text)
 if __name__ == '__main__':
     import sys
     app = QtGui.QApplication(sys.argv)
