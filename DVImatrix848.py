@@ -92,11 +92,12 @@ class communicator(object):
 
         if not self.serial or not self.connectTime:
                 return None
+        ser=self.serial
         sleeptime=self.connectTime + 1 - time.time()
         if sleeptime > 0:
                 time.sleep(sleeptime)
-        self.serial.write(data)
-        self.serial.flush() ## untested
+        ser.write(data)
+        ser.flush() ## untested
         if readback is None:
             return None
         if readback is True:
