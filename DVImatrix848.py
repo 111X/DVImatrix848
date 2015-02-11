@@ -97,8 +97,8 @@ class communicator(object):
         ## might block
         if not self.serial:
                 return None
-        command='#PRRS\r'
-        res=self.send(command)
+        #command='#PRRS\r'
+        #res=self.send(command)
         d=dict()
         ## dummy data
         d[0]=0
