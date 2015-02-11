@@ -1,11 +1,1 @@
-m
-**** MATRIX STATUS ****
-MonA: {DviIn=3 , Hpd=0 , DviOutEn=0 , InDDC=3 , DDC-Master=0 PreEmphasis=0 [db]}
-MonB: {DviIn=5 , Hpd=0 , DviOutEn=0 , InDDC=5 , DDC-Master=0 PreEmphasis=0 [db]}
-MonC: {DviIn=3 , Hpd=0 , DviOutEn=0 , InDDC=3 , DDC-Master=0 PreEmphasis=0 [db]}
-MonD: {DviIn=1 , Hpd=0 , DviOutEn=0 , InDDC=1 , DDC-Master=0 PreEmphasis=0 [db]}
-MonE: {DviIn=2 , Hpd=0 , DviOutEn=0 , InDDC=2 , DDC-Master=0 PreEmphasis=0 [db]}
-MonF: {DviIn=3 , Hpd=0 , DviOutEn=0 , InDDC=3 , DDC-Master=0 PreEmphasis=0 [db]}
-MonG: {DviIn=2 , Hpd=0 , DviOutEn=0 , InDDC=2 , DDC-Master=0 PreEmphasis=0 [db]}
-MonH: {DviIn=1 , Hpd=0 , DviOutEn=0 , InDDC=1 , DDC-Master=0 PreEmphasis=0 [db]}
-
+m**** MATRIX STATUS ****MonA: {DviIn=3 , Hpd=0 , DviOutEn=0 , InDDC=3 , DDC-Master=0 PreEmphasis=0 [db]}MonB: {DviIn=5 , Hpd=0 , DviOutEn=0 , InDDC=5 , DDC-Master=0 PreEmphasis=0 [db]}MonC: {DviIn=3 , Hpd=0 , DviOutEn=0 , InDDC=3 , DDC-Master=0 PreEmphasis=0 [db]}MonD: {DviIn=1 , Hpd=0 , DviOutEn=0 , InDDC=1 , DDC-Master=0 PreEmphasis=0 [db]}MonE: {DviIn=2 , Hpd=0 , DviOutEn=0 , InDDC=2 , DDC-Master=0 PreEmphasis=0 [db]}MonF: {DviIn=3 , Hpd=0 , DviOutEn=0 , InDDC=3 , DDC-Master=0 PreEmphasis=0 [db]}MonG: {DviIn=2 , Hpd=0 , DviOutEn=0 , InDDC=2 , DDC-Master=0 PreEmphasis=0 [db]}MonH: {DviIn=1 , Hpd=0 , DviOutEn=0 , InDDC=1 , DDC-Master=0 PreEmphasis=0 [db]}
