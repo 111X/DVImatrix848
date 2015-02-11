@@ -138,14 +138,10 @@ class communicator(object):
         ## gets all outputs with their selected inputs (as a dictionary)
         ## might block
         if not self.serial:
-                return None
-        #command='#PRRS\r'
-        #res=self.send(command)
-        d=dict()
-        ## dummy data
-        d[0]=0
-        d[2]=3
-
+            return None
+        command='m\r'
+        res=self.send(command, 673)
+        d=_parseRoutingMatrixString(res)
         return d
 
 
