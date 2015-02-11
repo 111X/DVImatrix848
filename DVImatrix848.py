@@ -267,6 +267,17 @@ class DVImatrix848(QtGui.QMainWindow):
                 butn.setStatusTip(u"%s → %s" % (input, output))
                 outgroup.buttonClicked.connect(self.clickedRouting)
                 #print("connected %s for %s" % (outgroup, butn))
+    def _updateTooltips(self):
+        inputs=self.inputs
+        outputs=self.outputs
+        for outnum, output in enumerate(outputs):
+            for innum, input in enumerate(inputs):
+                itm=self.gridLayout.itemAtPosition(innum+1, outnum+1)
+                if itm:
+                    wdg=itm.widget()
+                    wdg.setToolTip(u"%s → %s" % (input, output))
+                    wdg.setStatusTip(u"%s → %s" % (input, output))
+
     def _replaceWidget(self, wdg, row, col):
         oldwdgitm=self.gridLayout.itemAtPosition(row, col)
         if oldwdgitm:
