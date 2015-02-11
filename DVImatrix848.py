@@ -136,7 +136,7 @@ class DVImatrix848(QtGui.QMainWindow):
 
         self.getMatrix()
 
-    def setupUI(self):
+    def setupStaticUI(self):
         self.resize(320, 240)
         self.centralwidget = QtGui.QWidget(self)
         self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
@@ -202,7 +202,6 @@ class DVImatrix848(QtGui.QMainWindow):
         self.matrixButton.clicked.connect(self.getMatrix)
         self.gridLayout.addWidget(self.matrixButton, 0,0,1,1)
 
-        self.setupDynamicUI()
     def setupDynamicUI(self):
         inputs=self.inputs
         outputs=self.outputs
