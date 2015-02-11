@@ -263,8 +263,8 @@ class DVImatrix848(QtGui.QMainWindow):
                                           )
                 outgroup.addButton(butn)
                 outgroup.setId(butn, innum)
-                butn.setToolTip("%s -> %s" % (input, output))
-                butn.setStatusTip("%s -> %s" % (input, output))
+                butn.setToolTip(u"%s → %s" % (input, output))
+                butn.setStatusTip(u"%s → %s" % (input, output))
                 outgroup.buttonClicked.connect(self.clickedRouting)
                 #print("connected %s for %s" % (outgroup, butn))
     def _replaceWidget(self, wdg, row, col):
