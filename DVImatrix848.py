@@ -22,7 +22,7 @@ from PySide import QtGui, QtCore
 import serial
 import time
 
-import ConfigParser
+import json
 
 
 def getConfigFile():
@@ -35,7 +35,7 @@ def getConfigFile():
         appdatadir = os.path.join(os.path.expanduser("~"), ".config", "DVImatrix848")
     if not os.path.isdir(appdatadir):
         os.mkdir(appdatadir)
-    return os.path.join(appdatadir, "setup.ini")
+    return os.path.join(appdatadir, "setup.json")
 
 class communicator(object):
     def __init__(self):
@@ -363,54 +363,69 @@ class DVImatrix848(QtGui.QMainWindow):
         if not configfile:
             configfile=self.configfile
         if not configfile:
-            configfile='DVImatrix848.ini'
-        config = ConfigParser.SafeConfigParser(allow_no_value=True)
-        config.read(configfile)
-        if not config.has_section('INPUTS'):
-            self.statusBar().showMessage("WARNING: no 'INPUTS' section in configuration %s" % (configfile))
-            config.add_section('INPUTS')
-        if not config.options('INPUTS'):
-            self.statusBar().showMessage("WARNING: no inputs in 'INPUTS' section in configuration %s" % (configfile))
-            for i in range(4):
-                config.set('INPUTS', ('in#%d' % (i+1)), None)
-        self.inputs=config.options('INPUTS')
-        if not config.has_section('OUTPUTS'):
-            self.statusBar().showMessage("WARNING: no 'OUTPUTS' section in configuration %s" % (configfile))
-            config.add_section('OUTPUTS')
-        if not config.options('OUTPUTS'):
-            self.statusBar().showMessage("WARNING: no outputs in 'OUTPUTS' section in configuration %s" % (configfile))
-            for i in range(4):
-                config.set('OUTPUTS', ('out#%d' % (i+1)), None)
-        self.outputs=config.options('OUTPUTS')
+            configfile='DVImatrix848.json'
 
-        self.config=config
+        config=None
+        try:
+            with open(configfile, 'ro') as cf:
+                config=json.load(cf)
+        except (IOError, ValueError):
+            self.statusBar().showMessage("WARNING: no configfile '%s'" % (configfile))
+        if not config:
+            config={}
+        if not isinstance(config, dict):
+            self.statusBar().showMessage("ERROR: illegal configfile '%s'" % (configfile))
+
+        try:
+            x=config['INPUTS']
+            if isinstance(x, list):
+                self.inputs=x
+        except KeyError:
+            self.statusBar().showMessage("WARNING: no 'INPUTS' in configuration %s" % (configfile))
+            self.inputs=[ 'IN#%s' % x for x in range(8) ]
+        try:
+            x=config['OUTPUTS']
+            if isinstance(x, list):
+                self.outputs=x
+        except KeyError:
+            self.statusBar().showMessage("WARNING: no 'OUTPUTS' in configuration %s" % (configfile))
+            self.outputs=[ 'OUT#%s' % x for x in range(8) ]
+
+        try:
+            d=config['serial']
+            port=d['port']
+            self.selectSerial(port)
+        except (KeyError, TypeError) as e:
+            self.statusBar().showMessage("WARNING: no 'serial' configuration %s" % (configfile))
+
+
         self.configfile=configfile
     def writeConfig(self, configfile=None):
         if not configfile:
             configfile=self.configfile
         if not configfile:
-            configfile='DVImatrix848.ini'
-        self.configfile=configfile
-        config = ConfigParser.SafeConfigParser(allow_no_value=True)
+            configfile='DVImatrix848.json'
 
-        config.add_section('serial')
-        config.set('serial', '# serial-port settings')
+
+        serialconf={}
+        d={}
         portname=self.comm.getConnection()
         if portname:
-            config.set('serial', 'port', portname)
-        config.add_section('INPUTS')
-        config.set('INPUTS', '# list of inputs (one per line)')
-        config.set('INPUTS', '#   MUST NOT contain "=" (equal sign)')
-        for i in self.inputs:
-            config.set('INPUTS', i, None)
-        config.add_section('OUTPUTS')
-        config.set('OUTPUTS', '# list of outputs (one per line)')
-        config.set('OUTPUTS', '#   MUST NOT contain "=" (equal sign)')
-        for o in self.outputs:
-            config.set('OUTPUTS', o, None)
+            serialconf['port']=portname
+        if serialconf:
+            d['serial']=serialconf
+        print("portname='%s'\nserialconf=%s\nconf=%s" % (portname, serialconf, d))
+
+        if self.inputs:
+            d['INPUTS']=self.inputs
+        if self.outputs:
+            d['OUTPUTS']=self.outputs
 
         with open(configfile, 'wb') as cf:
-            config.write(cf)
+            json.dump(d, cf,
+                      indent=4,
+                      ensure_ascii=True,
+            )
 
 if __name__ == '__main__':
     import sys
