@@ -2,10 +2,26 @@
 
 simple control program for the [Gefen EXT-DVI-848](http://www.gefen.com/kvm/ext-dvi-848.jsp?prod_id=5311), an 8x8 routing matrix for DVI-signals.
 
+##Building a standalong application on W32
+
+You will need a number of things installed
+- Python2.7
+- PySide (`pip install PySide`)
+- py2exe http://www.py2exe.org/
+- pyserial http://pyserial.sourceforge.net/
+- pywin32 http://sourceforge.net/projects/pywin32/files/pywin32/
+- Microsoft Visual C++ 2008 Redistributable Package (9.0.21022.8) http://www.microsoft.com/en-us/download/details.aspx?id=29
+
+Once everything is in place, run:
+
+~~~bash
+python.exe .\setup.py py2exe
+~~~
+
 ##Gefen EXT-DVI-848
 Documentation about the device can be found at http://www.gefen.com/pdf/EXT-DVI-848.pdf
 
-The interesting parts (commands to control the device via the serial line) can be found in *Appendix B*.
+The interesting parts (commands to controal the device via the serial line) can be found in *Appendix B*.
 
 ###RS232 settings
 - Bits per second: 19200
