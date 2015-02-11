@@ -284,10 +284,13 @@ class DVImatrix848(QtGui.QMainWindow):
         if not routes:
             return
         for o in routes:
-            i=routes[o]
-            #print("input[%s] -> output[%s]" % (i,o))
-            buttons=self.outgroup[o].buttons()
-            buttons[i].setChecked(True)
+            try:
+                i=routes[o]
+                #print("input[%s] -> output[%s]" % (i,o))
+                buttons=self.outgroup[o].buttons()
+                buttons[i].setChecked(True)
+            except IndexError:
+                pass
 
     def clickedRouting(self, btn):
         btngrp=btn.group()
