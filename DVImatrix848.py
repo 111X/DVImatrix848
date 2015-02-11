@@ -429,7 +429,7 @@ class DVImatrix848(QtGui.QMainWindow):
 
         config=None
         try:
-            with open(configfile, 'ro') as cf:
+            with open(configfile, 'rb') as cf:
                 config=json.load(cf)
         except (IOError, ValueError) as e:
             self.status("WARNING: configfile error: %s" % (e))
