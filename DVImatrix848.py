@@ -18,15 +18,16 @@
 # You should have received a copy of the GNU General Public License
 # along with DVImatrix848.  If not, see <http://www.gnu.org/licenses/>.
 from PySide import QtGui, QtCore
-
-import serial
-import time
-
-import json
 from QtSingleApplication import QtSingleApplication
 
+import os, sys, time, re, random
+
+import serial
+import serial.tools.list_ports
+
+import json
+
 def _makeRandomRoutes():
-    import random
     routes={}
     for i in range(8):
         routes[i]=random.randint(1,8)
@@ -44,7 +45,6 @@ def _parseRoutingMatrixString(s):
     routes={}
     if not s:
         return routes
-    import re
     pat = r"^Mon(?P<output>[A-Z]+): {DviIn=(?P<input>[0-9]+) ,.*}$"
     for x in s.split('\r'):
         match=re.search(pat, x)
@@ -64,7 +64,6 @@ def _testRoutingParser():
         print("%d bytes match: %s" % (len(rs), r0))
 
 def getConfigFile():
-    import os
     if os.name == "nt":
         from win32com.shell import shellcon, shell
         appdatadir=os.path.join(shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0),
@@ -361,7 +360,6 @@ class DVImatrix848(QtGui.QMainWindow):
             self.menuSerial_Ports.removeAction(action)
             self.serialSelections.removeAction(action)
         self.serialPorts=[]
-        import serial.tools.list_ports
         for (port_name,port_desc,_) in serial.tools.list_ports.comports():
             action=QtGui.QAction(self)
             action.setText(port_name)
@@ -410,7 +408,6 @@ class DVImatrix848(QtGui.QMainWindow):
 
     def exit(self):
         self.writeConfig()
-        import sys
         sys.exit()
     def readConfig(self, configfile=None):
         if not configfile:
@@ -486,7 +483,8 @@ if __name__ == '__main__':
     ## appGuid=str(uuid.uuid5(uuid.NAMESPACE_DNS, 'github.com/iem-projects/DVImatrix848'))
     appGuid='78cf6144-49c4-5a01-ade8-db93316aff6c'
 
-    import sys
+
+
     app = QtSingleApplication(appGuid, sys.argv)
     if app.isRunning(): sys.exit(0)
 
