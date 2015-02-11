@@ -25,6 +25,44 @@ import time
 import json
 from QtSingleApplication import QtSingleApplication
 
+def _makeRandomRoutes():
+    import random
+    routes={}
+    for i in range(8):
+        routes[i]=random.randint(1,8)
+    return routes
+
+def _getRoutingMatrixUnparsed(routes):
+    S=['m']
+    S+=['**** MATRIX STATUS ****']
+    for o in routes:
+        i=routes[o]
+        o_=chr(o+65)
+        S+=["Mon%s: {DviIn=%d , Hpd=0 , DviOutEn=0 , InDDC=%d , DDC-Master=0 PreEmphasis=0 [db]}" % (o_, i+1, i+1)]
+    return '\r'.join(S)
+def _parseRoutingMatrixString(s):
+    routes={}
+    if not s:
+        return routes
+    import re
+    pat = r"^Mon(?P<output>[A-Z]+): {DviIn=(?P<input>[0-9]+) ,.*}$"
+    for x in s.split('\r'):
+        match=re.search(pat, x)
+        if match:
+            d=match.groupdict()
+            try:
+                routes[ord(d['output'])-65]=int(d['input'])-1
+            except (KeyError, TypeError, ValueError):
+                pass
+    return routes
+
+def _testRoutingParser():
+    r0=_makeRandomRoutes()
+    rs=_getRoutingMatrixUnparsed(r0)
+    r1=_parseRoutingMatrixString(rs)
+    if r0 == r1:
+        print("%d bytes match: %s" % (len(rs), r0))
+
 def getConfigFile():
     import os
     if os.name == "nt":
