@@ -27,6 +27,11 @@ import serial.tools.list_ports
 
 import json
 
+FETCHMATRIX_NEVER=0x0
+FETCHMATRIX_ONCONNECT=0x1
+FETCHMATRIX_INTERACTIVE=0x2
+FETCHMATRIX_ALWAYS=FETCHMATRIX_ONCONNECT|FETCHMATRIX_INTERACTIVE
+
 def _makeRandomRoutes():
     routes={}
     for i in range(8):
@@ -147,9 +152,12 @@ class communicator(object):
 
 class DVImatrix848(QtGui.QMainWindow):
     def __init__(self,
-                 configfile=None
+                 configfile=None,
+                 fetchMatrix=FETCHMATRIX_ALWAYS
                  ):
         super(DVImatrix848, self).__init__()
+        self.whenFetchMatrix=FETCHMATRIX_NEVER
+
         if configfile is None:
             configfile=getConfigFile()
         self.comm=communicator()
@@ -169,13 +177,18 @@ class DVImatrix848(QtGui.QMainWindow):
         self.setupStaticUI()
 
         self.rescanSerial()
+        self.whenFetchMatrix=fetchMatrix
         self.readConfig(configfile)
 
         self.setupDynamicUI()
         if self.serialport:
             self.selectSerial(self.serialport)
 
-        self.getMatrix()
+        if self.whenFetchMatrix & FETCHMATRIX_ONCONNECT:
+            self.getMatrix()
+        else:
+            print("using config-matrix: %s" % (self.out4in))
+            self.setRouting(self.out4in)
 
     def setupStaticUI(self):
         self.resize(320, 240)
@@ -370,6 +383,7 @@ class DVImatrix848(QtGui.QMainWindow):
             self.routeInput2Output(innum, outnum)
 
     def routeInput2Output(self, innum, outnum):
+        print("%s -> %s [%s]" % (outnum, innum, self.out4in))
         self.out4in[outnum]=innum
         self.comm.route(innum, outnum)
         #print("TODO: connect: %s -> %s" % (innum, outnum))
@@ -526,12 +540,10 @@ if __name__ == '__main__':
     ## appGuid=str(uuid.uuid5(uuid.NAMESPACE_DNS, 'github.com/iem-projects/DVImatrix848'))
     appGuid='78cf6144-49c4-5a01-ade8-db93316aff6c'
 
-
-
     app = QtSingleApplication(appGuid, sys.argv)
     if app.isRunning(): sys.exit(0)
 
-    window = DVImatrix848()
+    window = DVImatrix848(fetchMatrix=FETCHMATRIX_NEVER)
     app.setActivationWindow(window)
     window.show()
     # Run the main Qt loop
