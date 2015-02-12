@@ -327,6 +327,9 @@ class DVImatrix848(QtGui.QMainWindow):
     def getMatrix(self):
         routes=self.comm.getRoutes()
         #print("got matrix: %s" % (routes))
+        self.setRouting(routes, False)
+    def setRouting(self, routes, apply=True):
+        print("setRouting: %s" % (routes))
         for og in self.outgroup:
             btn = og.checkedButton()
             if btn:
@@ -337,6 +340,14 @@ class DVImatrix848(QtGui.QMainWindow):
             return
         print("routes=%s" % (routes))
         print("outgroups=%s" % (len(self.outgroup)))
+        if apply:
+            d=self.out4in
+            for o in d:
+                self.routeInput2Output(d[o], o)
+            self.getMatrix()
+        else:
+            self.showRouting(routes)
+    def showRouting(self, routes):
         for o in routes:
             try:
                 i=routes[o]
@@ -345,7 +356,6 @@ class DVImatrix848(QtGui.QMainWindow):
                 buttons[i].setChecked(True)
             except IndexError:
                 pass
-
     def clickedRouting(self, btn):
         btngrp=btn.group()
         innum=btngrp.checkedId()
