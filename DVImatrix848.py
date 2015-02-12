@@ -419,10 +419,12 @@ class DVImatrix848(QtGui.QMainWindow):
                     self.comm.connect(name)
                     action.setChecked(True)
                     self.status("serial port connected to %s" % (name))
+                    self.groupBox.setEnabled(True)
 
                 except serial.serialutil.SerialException as e:
                     self.status("ERROR: %s" % (e))
                     action.setChecked(False)
+                    self.groupBox.setEnabled(False)
                     fetchMatrix=False
                 break
         if fetchMatrix:
