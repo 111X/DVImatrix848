@@ -28,9 +28,9 @@ import serial.tools.list_ports
 import json
 
 FETCHMATRIX_NEVER=0x0
-FETCHMATRIX_ONCONNECT=0x1
+FETCHMATRIX_AUTOMATIC=0x1
 FETCHMATRIX_INTERACTIVE=0x2
-FETCHMATRIX_ALWAYS=FETCHMATRIX_ONCONNECT|FETCHMATRIX_INTERACTIVE
+FETCHMATRIX_ALWAYS=FETCHMATRIX_AUTOMATIC|FETCHMATRIX_INTERACTIVE
 
 def _makeRandomRoutes():
     routes={}
@@ -157,11 +157,6 @@ class DVImatrix848(QtGui.QMainWindow):
                  ):
         super(DVImatrix848, self).__init__()
         self.whenFetchMatrix=FETCHMATRIX_NEVER
-
-        if configfile is None:
-            configfile=getConfigFile()
-        self.comm=communicator()
-
         self.inputs=[]
         self.outputs=[]
         self.configfile=None
@@ -171,24 +166,31 @@ class DVImatrix848(QtGui.QMainWindow):
         self.serialPorts=[] # array of name/menuitem pais
         self.serialport=None
 
+        self.comm=communicator()
+
+        if configfile is None:
+            configfile=getConfigFile()
+        self.whenFetchMatrix=fetchMatrix
+        self.readConfig(configfile)
+
         self.serialSelections= QtGui.QActionGroup(self)
         self.serialSelections.triggered.connect(self.selectSerialByMenu)
 
         self.setupStaticUI()
 
         self.rescanSerial()
-        self.whenFetchMatrix=fetchMatrix
-        self.readConfig(configfile)
 
         self.setupDynamicUI()
         if self.serialport:
-            self.selectSerial(self.serialport)
+            self.selectSerial(self.serialport, False)
 
-        if self.whenFetchMatrix & FETCHMATRIX_ONCONNECT:
+        if self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC:
             self.getMatrix()
         else:
             print("using config-matrix: %s" % (self.out4in))
             self.setRouting(self.out4in)
+            self.showRouting(self.out4in)
+        print("when: %s" % self.whenFetchMatrix)
 
     def setupStaticUI(self):
         self.resize(320, 240)
@@ -254,7 +256,12 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menuSerial_Ports.setTitle("Serial Ports")
 
         self.matrixButton = QtGui.QPushButton("Get State")
-        #self.matrixButton.setEnabled(False)
+        print("fetchmatrix: %s" % (self.whenFetchMatrix))
+        if self.whenFetchMatrix & FETCHMATRIX_INTERACTIVE:
+            print("interactive")
+            self.matrixButton.setEnabled(True)
+        else:
+            self.matrixButton.setEnabled(False)
         self.matrixButton.clicked.connect(self.getMatrix)
         self.gridLayout.addWidget(self.matrixButton, 0,0,1,1, QtCore.Qt.AlignCenter)
 
@@ -339,7 +346,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.enableLabelEditing(state)
     def getMatrix(self):
         routes=self.comm.getRoutes()
-        #print("got matrix: %s" % (routes))
+        print("got matrix: %s" % (routes))
         self.setRouting(routes, False)
     def setRouting(self, routes, apply=True):
         print("setRouting: %s" % (routes))
@@ -351,13 +358,12 @@ class DVImatrix848(QtGui.QMainWindow):
                 og.setExclusive(True);
         if not routes:
             return
-        print("routes=%s" % (routes))
-        print("outgroups=%s" % (len(self.outgroup)))
         if apply:
             d=self.out4in
             for o in d:
                 self.routeInput2Output(d[o], o)
-            self.getMatrix()
+            if self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC:
+                self.getMatrix()
         else:
             self.showRouting(routes)
     def showRouting(self, routes):
@@ -421,6 +427,7 @@ class DVImatrix848(QtGui.QMainWindow):
                 self.selectSerial()
 
     def selectSerial(self, portname=None, fetchMatrix=True):
+        print("selectSerial: fetch=%s" % (fetchMatrix))
         print("selecting %s in %s" % (portname, [x for (x,y) in self.serialPorts]))
         for (name,action) in self.serialPorts:
             if portname is None:
@@ -445,7 +452,9 @@ class DVImatrix848(QtGui.QMainWindow):
             self.getMatrix()
 
     def selectSerialByMenu(self):
-        return self.selectSerial()
+        shouldselect=bool(self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC)
+        print("selectSerial: %s =%s&%s" % (shouldselect, self.whenFetchMatrix, FETCHMATRIX_AUTOMATIC))
+        return self.selectSerial(fetchMatrix=shouldselect)
 
     def exit(self):
         self.writeConfig()
@@ -488,6 +497,20 @@ class DVImatrix848(QtGui.QMainWindow):
         except (KeyError, TypeError) as e:
             self.status("WARNING: no 'serial' configuration %s" % (configfile))
 
+        wf=FETCHMATRIX_ALWAYS
+        try:
+            d=config['generic']
+            whenfetch=str(d['fetchstate']).lower()
+            if whenfetch.startswith('never'):
+                wf=FETCHMATRIX_NEVER
+            if whenfetch.startswith('auto'):
+                wf=FETCHMATRIX_AUTOMATIC
+            if whenfetch.startswith('inter'):
+                wf=FETCHMATRIX_INTERACTIVE
+        except (KeyError, TypeError) as e:
+            self.status("WARNING: no 'serial' configuration %s" % (configfile))
+        self.whenFetchMatrix=wf
+
         try:
             d=config['matrix']
             if d:
@@ -510,9 +533,20 @@ class DVImatrix848(QtGui.QMainWindow):
         if not configfile:
             configfile='DVImatrix848.json'
 
+        d={}
+
+        d_generic={}
+        whenfetch='always'
+        if self.whenFetchMatrix == FETCHMATRIX_NEVER:
+            whenfetch='never'
+        elif self.whenFetchMatrix == FETCHMATRIX_AUTOMATIC:
+            whenfetch='auto'
+        elif self.whenFetchMatrix == FETCHMATRIX_INTERACTIVE:
+            whenfetch='interactive'
+        d_generic['fetchstate']=whenfetch
+        d['generic']=d_generic
 
         serialconf={}
-        d={}
         portname=self.comm.getConnection()
         if portname:
             serialconf['port']=portname
