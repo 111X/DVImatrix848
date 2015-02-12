@@ -406,7 +406,7 @@ class DVImatrix848(QtGui.QMainWindow):
                 acts[0].setChecked(True)
                 self.selectSerial()
 
-    def selectSerial(self, portname=None):
+    def selectSerial(self, portname=None, fetchMatrix=True):
         print("selecting %s in %s" % (portname, [x for (x,y) in self.serialPorts]))
         for (name,action) in self.serialPorts:
             if portname is None:
@@ -418,13 +418,16 @@ class DVImatrix848(QtGui.QMainWindow):
                 try:
                     self.comm.connect(name)
                     action.setChecked(True)
-                    self.getMatrix()
                     self.status("serial port connected to %s" % (name))
 
                 except serial.serialutil.SerialException as e:
                     self.status("ERROR: %s" % (e))
                     action.setChecked(False)
+                    fetchMatrix=False
                 break
+        if fetchMatrix:
+            self.getMatrix()
+
     def selectSerialByMenu(self):
         return self.selectSerial()
 
