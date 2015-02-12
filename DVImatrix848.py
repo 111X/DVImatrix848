@@ -469,6 +469,20 @@ class DVImatrix848(QtGui.QMainWindow):
         except (KeyError, TypeError) as e:
             self.status("WARNING: no 'serial' configuration %s" % (configfile))
 
+        try:
+            d=config['matrix']
+            if d:
+                routes={}
+                ## fix the keys: we want int, not strings
+                for k in d:
+                    try:
+                        routes[int(k)]=d[k]
+                    except (ValueError):
+                        pass
+                self.out4in=routes
+                print("configmatrix: %s" % (routes))
+        except (KeyError, TypeError) as e:
+            self.status("WARNING: no 'serial' configuration %s" % (configfile))
 
         self.configfile=configfile
     def writeConfig(self, configfile=None):
@@ -491,6 +505,8 @@ class DVImatrix848(QtGui.QMainWindow):
             d['INPUTS']=self.inputs
         if self.outputs:
             d['OUTPUTS']=self.outputs
+        if self.out4in:
+            d['matrix']=self.out4in
 
         with open(configfile, 'wb') as cf:
             json.dump(d, cf,
