@@ -44,10 +44,10 @@ if os.name == 'nt':
             break
     data_files += [('media', glob(r'media\*.*'))]
     import py2exe
-    setup(windows=[
+    setup(windows=[{
         'script': 'DVImatrix848.py',
         'icon_resources': [(1, "media\DVImatrix848.ico")]
-        ],
+        }],
         data_files=data_files,
         )
     #setup(console=['DVImatrix848.py'])
