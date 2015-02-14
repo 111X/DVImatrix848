@@ -39,11 +39,23 @@ def getMSVCfiles():
             sys.path.append(p)
             return glob(r'%s\*.*' % p)
     return None
+
+
+def getSVGLIBfiles():
+    import PySide
+    return glob(os.path.join(os.path.dirname(os.path.realpath(PySide.__file__)),
+                             'plugins', 'imageformats',
+                             '*svg*.dll'))
+
 if os.name == 'nt':
     data_files=[]
     f=getMSVCfiles()
     if f:
         data_files += [("Microsoft.VC90.CRT", f)]
+
+    f=getSVGLIBfiles()
+    if f:
+        data_files += [("imageformats", f)]
 
     data_files += [('media', glob(r'media\*.*'))]
 
