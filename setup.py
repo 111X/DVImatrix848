@@ -65,5 +65,9 @@ if os.name == 'nt':
         'icon_resources': [(1, "media\DVImatrix848.ico")]
         }],
         data_files=data_files,
+        options={"py2exe": {
+            "includes": ['PySide.QtSvg', 'PySide.QtXml'],
+            }
+        },
         )
     #setup(console=['DVImatrix848.py'])
