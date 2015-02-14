@@ -61,13 +61,17 @@ if os.name == 'nt':
 
     import py2exe
     setup(windows=[{
+        'icon_resources': [(1, "media\DVImatrix848.ico")],
         'script': 'DVImatrix848.py',
-        'icon_resources': [(1, "media\DVImatrix848.ico")]
         }],
         data_files=data_files,
         options={"py2exe": {
             "includes": ['PySide.QtSvg', 'PySide.QtXml'],
+            "bundle_files": 3,
+#            "optimize": 2,
+#            "compressed": True
             }
         },
+        zipfile=None,
         )
     #setup(console=['DVImatrix848.py'])
