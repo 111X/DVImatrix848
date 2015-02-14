@@ -35,13 +35,14 @@ if os.name == 'nt':
     msvcrt_paths=[(r'%s\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT' % program_path)]
     ## python2.7 seems to be built against VC90 (9.0.21022), so let's try that
     msvcrt_paths+=glob(r'%s\x86_microsoft.vc90.crt_*_9.0.21022.8_*_*' "\\" % winsxs_path)
-    data_files=None
+    data_files=[]
     for p in msvcrt_paths:
         if os.path.exists(os.path.join(p, 'msvcp90.dll')):
             data_files = [("Microsoft.VC90.CRT",
                            glob(r'%s\*.*' % p))]
             sys.path.append(p)
             break
+    data_files += [('media', glob(r'media\*.*'))]
     import py2exe
     setup(windows=['DVImatrix848.py'],
           data_files=data_files,
