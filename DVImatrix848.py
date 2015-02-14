@@ -250,7 +250,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.setStatusBar(self.statusbar)
 
         self.setWindowTitle("DVImatrix848")
-        self.groupBox.setTitle("DVImatrix848")
+        self.groupBox.setTitle("Routing matrix")
         self.menuFile.setTitle("File")
         self.menuConfiguration.setTitle("Configuration")
         self.menuSerial_Ports.setTitle("Serial Ports")
