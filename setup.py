@@ -23,10 +23,9 @@ except ImportError:
 
 from distutils.core import setup
 import os
+from glob import glob
 
-
-if os.name == 'nt':
-    from glob import glob
+def getMSVCfiles():
     ## urgh, find the msvcrt redistributable DLLs
     ## either it's in the MSVC90 application folder
     ## or in some winsxs folder
@@ -35,14 +34,19 @@ if os.name == 'nt':
     msvcrt_paths=[(r'%s\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT' % program_path)]
     ## python2.7 seems to be built against VC90 (9.0.21022), so let's try that
     msvcrt_paths+=glob(r'%s\x86_microsoft.vc90.crt_*_9.0.21022.8_*_*' "\\" % winsxs_path)
-    data_files=[]
     for p in msvcrt_paths:
         if os.path.exists(os.path.join(p, 'msvcp90.dll')):
-            data_files = [("Microsoft.VC90.CRT",
-                           glob(r'%s\*.*' % p))]
             sys.path.append(p)
-            break
+            return glob(r'%s\*.*' % p)
+    return None
+if os.name == 'nt':
+    data_files=[]
+    f=getMSVCfiles()
+    if f:
+        data_files += [("Microsoft.VC90.CRT", f)]
+
     data_files += [('media', glob(r'media\*.*'))]
+
     import py2exe
     setup(windows=[{
         'script': 'DVImatrix848.py',
