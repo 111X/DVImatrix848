@@ -249,7 +249,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.statusbar = QtGui.QStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.setWindowTitle("MainWindow")
+        self.setWindowTitle("DVImatrix848")
         self.groupBox.setTitle("DVImatrix848")
         self.menuFile.setTitle("File")
         self.menuConfiguration.setTitle("Configuration")
