@@ -256,7 +256,10 @@ class DVImatrix848(QtGui.QMainWindow):
         self.setStatusBar(self.statusbar)
 
         self.setWindowTitle("DVImatrix848")
-        self.setWindowIcon(QtGui.QIcon("media/DVImatrix848.svg"))
+        if os.name == 'nt':
+            self.setWindowIcon(QtGui.QIcon("media/DVImatrix848.ico"))
+        else:
+            self.setWindowIcon(QtGui.QIcon("media/DVImatrix848.svg"))
         self.groupBox.setTitle("Routing matrix")
         self.menuFile.setTitle("File")
         self.menuConfiguration.setTitle("Configuration")
