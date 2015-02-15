@@ -252,6 +252,15 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuConfiguration.menuAction())
 
+        self.menuHelp = QtGui.QMenu(self.menubar)
+        self.menuHelp.setTitle("Help")
+        self.actionHelp = QtGui.QAction(self)
+        self.actionHelp.setText("Online Help")
+        self.actionHelp.setStatusTip("Read online help")
+        self.actionHelp.activated.connect(self.openHelp)
+        self.menuHelp.addAction(self.actionHelp)
+        self.menubar.addAction(self.menuHelp.menuAction())
+
         self.statusbar = QtGui.QStatusBar(self)
         self.setStatusBar(self.statusbar)
 
@@ -573,6 +582,8 @@ class DVImatrix848(QtGui.QMainWindow):
                       indent=4,
                       ensure_ascii=True,
             )
+    def openHelp(self):
+        QtGui.QDesktopServices.openUrl('https://github.com/iem-projects/DVImatrix848/wiki')
     def status(self, text):
         self.statusBar().showMessage(text)
         print("STATE: %s" % text)
