@@ -4,7 +4,7 @@ from distutils.version import LooseVersion
 def stripVersionString(version_string):
     if version_string.startswith('v'):
 	version_string=version_string[1:]
-    return version_string
+    return version_string.strip()
 
 def getLatestVersion(j):
 	v=None
