@@ -36,6 +36,9 @@ if __name__ == '__main__':
     current_version=getCurrentVersion()
     github_version=getGithubVersion("iem-projects/DVImatrix848")
     if LooseVersion(current_version) < LooseVersion(github_version):
-        print("new version available: %s" % (github_version))
+        print("new version available: '%s' (deprecating '%s')" %
+(github_version, current_version))
+    else:
+        print("congrats: version '%s' is uptodate" % (current_version))
 
     True
