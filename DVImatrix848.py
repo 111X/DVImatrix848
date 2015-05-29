@@ -220,6 +220,17 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menuConfiguration = QtGui.QMenu(self.menubar)
         self.menuSerial_Ports = QtGui.QMenu(self.menuConfiguration)
 
+        self.actionStore = QtGui.QAction(self)
+        self.actionStore.setText("Store")
+        self.actionStore.setStatusTip("Store a default routing")
+        #self.actionStore.setShortcut("Ctrl+S")
+        self.actionStore.activated.connect(self.store)
+        self.actionRestore = QtGui.QAction(self)
+        self.actionRestore.setText("Restore")
+        self.actionRestore.setStatusTip("Restore a default routing")
+        self.actionRestore.setShortcut("Ctrl+R")
+        self.actionRestore.activated.connect(self.restore)
+
         self.actionQuit = QtGui.QAction(self)
         self.actionQuit.setText("Quit")
         self.actionQuit.setStatusTip("Quit the application")
@@ -241,6 +252,8 @@ class DVImatrix848(QtGui.QMainWindow):
         self.actionEditLabels.setCheckable(True)
         self.actionEditLabels.activated.connect(self.editLabels)
 
+        self.menuFile.addAction(self.actionStore)
+        self.menuFile.addAction(self.actionRestore)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
         self.menuSerial_Ports.addAction(self.actionRescanSerial)
@@ -475,6 +488,13 @@ class DVImatrix848(QtGui.QMainWindow):
     def exit(self):
         self.writeConfig()
         sys.exit()
+
+    def store(self):
+        print("stored default routing matrix: %s" % (self.default_out4in))
+
+    def restore(self):
+        print("restored default routing matrix: %s" % (self.default_out4in))
+
     def readConfig(self, configfile=None):
         if not configfile:
             configfile=self.configfile
