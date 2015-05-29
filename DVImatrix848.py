@@ -491,9 +491,15 @@ class DVImatrix848(QtGui.QMainWindow):
         sys.exit()
 
     def store(self):
+        d={}
+        for out in self.out4in:
+            d[out]=self.out4in[out]
+        self.default_out4in=d
         print("stored default routing matrix: %s" % (self.default_out4in))
 
     def restore(self):
+        self.setRouting(self.default_out4in)
+        self.showRouting(self.default_out4in)
         print("restored default routing matrix: %s" % (self.default_out4in))
 
     def readConfig(self, configfile=None):
