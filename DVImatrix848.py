@@ -375,7 +375,7 @@ class DVImatrix848(QtGui.QMainWindow):
         if not routes:
             return
         if apply:
-            d=self.out4in
+            d=routes
             for o in d:
                 self.routeInput2Output(d[o], o)
             if self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC:
