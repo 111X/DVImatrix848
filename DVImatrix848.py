@@ -169,6 +169,7 @@ class DVImatrix848(QtGui.QMainWindow):
 
         self.outgroup=[]
         self.out4in={}
+        self.default_out4in={}
         self.serialPorts=[] # array of name/menuitem pais
         self.serialport=None
 
@@ -562,6 +563,21 @@ class DVImatrix848(QtGui.QMainWindow):
         except (KeyError, TypeError) as e:
             self.status("WARNING: no 'matrix' configuration %s" % (configfile))
 
+        try:
+            d=config['defaultmatrix']
+            if d:
+                routes={}
+                ## fix the keys: we want int, not strings
+                for k in d:
+                    try:
+                        routes[int(k)]=d[k]
+                    except (ValueError):
+                        pass
+                self.default_out4in=routes
+                print("defaultmatrix: %s" % (routes))
+        except (KeyError, TypeError) as e:
+            self.status("WARNING: no 'defaultmatrix' configuration %s" % (configfile))
+
         self.configfile=configfile
     def writeConfig(self, configfile=None):
         if not configfile:
@@ -596,6 +612,8 @@ class DVImatrix848(QtGui.QMainWindow):
             d['OUTPUTS']=self.outputs
         if self.out4in:
             d['matrix']=self.out4in
+        if self.default_out4in:
+            d['defaultmatrix']=self.default_out4in
 
         with open(configfile, 'wb') as cf:
             json.dump(d, cf,
