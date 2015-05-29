@@ -544,7 +544,7 @@ class DVImatrix848(QtGui.QMainWindow):
             if whenfetch.startswith('inter'):
                 wf=FETCHMATRIX_INTERACTIVE
         except (KeyError, TypeError) as e:
-            self.status("WARNING: no 'serial' configuration %s" % (configfile))
+            self.status("WARNING: no 'generic' configuration %s" % (configfile))
         self.whenFetchMatrix=wf
 
         try:
@@ -560,7 +560,7 @@ class DVImatrix848(QtGui.QMainWindow):
                 self.out4in=routes
                 print("configmatrix: %s" % (routes))
         except (KeyError, TypeError) as e:
-            self.status("WARNING: no 'serial' configuration %s" % (configfile))
+            self.status("WARNING: no 'matrix' configuration %s" % (configfile))
 
         self.configfile=configfile
     def writeConfig(self, configfile=None):
