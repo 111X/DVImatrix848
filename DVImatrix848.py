@@ -223,13 +223,13 @@ class DVImatrix848(QtGui.QMainWindow):
 
         self.actionStore = QtGui.QAction(self)
         self.actionStore.setText("Store")
-        self.actionStore.setStatusTip("Store a default routing")
-        #self.actionStore.setShortcut("Ctrl+S")
+        self.actionStore.setStatusTip("Store an emergency routing")
+        #self.actionStore.setShortcut("Ctrl+Shift+S")
         self.actionStore.activated.connect(self.store)
         self.actionRestore = QtGui.QAction(self)
         self.actionRestore.setText("Restore")
-        self.actionRestore.setStatusTip("Restore a default routing")
-        self.actionRestore.setShortcut("Ctrl+R")
+        self.actionRestore.setStatusTip("Restore emergency routing")
+        self.actionRestore.setShortcut("Ctrl+Shift+R")
         self.actionRestore.activated.connect(self.restore)
 
         self.actionQuit = QtGui.QAction(self)
