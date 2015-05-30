@@ -166,6 +166,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.inputs=[]
         self.outputs=[]
         self.configfile=None
+        self.allow_emergency_store=True
 
         self.outgroup=[]
         self.out4in={}
@@ -225,6 +226,8 @@ class DVImatrix848(QtGui.QMainWindow):
         self.actionStore.setText("Store")
         self.actionStore.setStatusTip("Store an emergency routing")
         #self.actionStore.setShortcut("Ctrl+Shift+S")
+        if not self.allow_emergency_store:
+            self.actionStore.setEnabled(False)
         self.actionStore.activated.connect(self.store)
         self.actionRestore = QtGui.QAction(self)
         self.actionRestore.setText("Restore")
@@ -543,13 +546,24 @@ class DVImatrix848(QtGui.QMainWindow):
         wf=FETCHMATRIX_ALWAYS
         try:
             d=config['generic']
-            whenfetch=str(d['fetchstate']).lower()
-            if whenfetch.startswith('never'):
-                wf=FETCHMATRIX_NEVER
-            if whenfetch.startswith('auto'):
-                wf=FETCHMATRIX_AUTOMATIC
-            if whenfetch.startswith('inter'):
-                wf=FETCHMATRIX_INTERACTIVE
+            if 'fetchstate' in d:
+                whenfetch=str(d['fetchstate']).lower()
+                if whenfetch.startswith('never'):
+                    wf=FETCHMATRIX_NEVER
+                if whenfetch.startswith('auto'):
+                    wf=FETCHMATRIX_AUTOMATIC
+                if whenfetch.startswith('inter'):
+                    wf=FETCHMATRIX_INTERACTIVE
+            else:
+                self.status("WARNING: no 'generic/fetchstate' configuration %s" % (configfile))
+            if 'emergencystore' in d:
+                if d['emergencystore']:
+                    self.allow_emergency_store=True
+                else:
+                    self.allow_emergency_store=False
+            else:
+                self.status("WARNING: no 'generic/fetchstate' configuration %s" % (configfile))
+
         except (KeyError, TypeError) as e:
             self.status("WARNING: no 'generic' configuration %s" % (configfile))
         self.whenFetchMatrix=wf
@@ -602,6 +616,8 @@ class DVImatrix848(QtGui.QMainWindow):
         elif self.whenFetchMatrix == FETCHMATRIX_INTERACTIVE:
             whenfetch='interactive'
         d_generic['fetchstate']=whenfetch
+        d_generic['emergencystore']=self.allow_emergency_store
+
         d['generic']=d_generic
 
         serialconf={}
