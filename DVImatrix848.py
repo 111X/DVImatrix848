@@ -555,6 +555,10 @@ class DVImatrix848(QtGui.QMainWindow):
         if not configfile:
             configfile = 'DVImatrix848.json'
 
+        def warn(section):
+            self.status("WARNING: no '%s' in configuration %s"
+                        % (section, configfile))
+
         config = None
         try:
             with open(configfile, 'rb') as cf:
@@ -572,24 +576,21 @@ class DVImatrix848(QtGui.QMainWindow):
             if isinstance(x, list):
                 self.inputs = x
         except KeyError:
-            self.status("WARNING: no 'INPUTS' in configuration %s"
-                        % (configfile))
+            warn('INPUTS')
             self.inputs = ['IN#%s' % x for x in range(8)]
         try:
             x = config['OUTPUTS']
             if isinstance(x, list):
                 self.outputs = x
         except KeyError:
-            self.status("WARNING: no 'OUTPUTS' in configuration %s"
-                        % (configfile))
+            warn('OUTPUTS')
             self.outputs = ['OUT#%s' % x for x in range(8)]
 
         try:
             d = config['serial']
             self.serialport = d['port']
         except (KeyError, TypeError) as e:
-            self.status("WARNING: no 'serial' configuration %s"
-                        % (configfile))
+            warn('serial')
 
         wf = FETCHMATRIX_ALWAYS
         try:
@@ -611,12 +612,10 @@ class DVImatrix848(QtGui.QMainWindow):
                 else:
                     self.allow_emergency_store = False
             else:
-                self.status("WARNING: no 'generic/fetchstate' configuration %s"
-                            % (configfile))
+                warn('generic:fetchstate')
 
         except (KeyError, TypeError) as e:
-            self.status("WARNING: no 'generic' configuration %s"
-                        % (configfile))
+            warn('generic')
         self.whenFetchMatrix = wf
 
         try:
@@ -632,7 +631,7 @@ class DVImatrix848(QtGui.QMainWindow):
                 self.out4in = routes
                 print("configmatrix: %s" % (routes))
         except (KeyError, TypeError) as e:
-            self.status("WARNING: no 'matrix' configuration %s" % (configfile))
+            warn('matrix')
 
         try:
             d = config['defaultmatrix']
@@ -647,8 +646,7 @@ class DVImatrix848(QtGui.QMainWindow):
                 self.default_out4in = routes
                 print("defaultmatrix: %s" % (routes))
         except (KeyError, TypeError) as e:
-            self.status("WARNING: no 'defaultmatrix' configuration %s"
-                        % (configfile))
+            warn('defaultmatrix')
 
         self.configfile = configfile
 
