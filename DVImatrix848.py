@@ -20,89 +20,108 @@
 from PySide import QtGui, QtCore
 from QtSingleApplication import QtSingleApplication
 
-import os, sys, time, re, random
+import os
+import sys
+import time
+import re
+import random
 
 import serial
 import serial.tools.list_ports
 
 import json
 
-FETCHMATRIX_NEVER=0x0
-FETCHMATRIX_AUTOMATIC=0x1
-FETCHMATRIX_INTERACTIVE=0x2
-FETCHMATRIX_ALWAYS=FETCHMATRIX_AUTOMATIC|FETCHMATRIX_INTERACTIVE
+FETCHMATRIX_NEVER = 0x0
+FETCHMATRIX_AUTOMATIC = 0x1
+FETCHMATRIX_INTERACTIVE = 0x2
+FETCHMATRIX_ALWAYS = FETCHMATRIX_AUTOMATIC | FETCHMATRIX_INTERACTIVE
+
 
 def _makeRandomRoutes():
-    routes={}
+    routes = {}
     for i in range(8):
-        routes[i]=random.randint(1,8)
+        routes[i] = random.randint(1, 8)
     return routes
 
+
 def _getRoutingMatrixUnparsed(routes):
-    S=['m']
-    S+=['**** MATRIX STATUS ****']
+    S = ['m']
+    S += ['**** MATRIX STATUS ****']
     for o in routes:
-        i=routes[o]
-        o_=chr(o+65)
-        S+=["Mon%s: {DviIn=%d , Hpd=0 , DviOutEn=0 , InDDC=%d , DDC-Master=0 PreEmphasis=0 [db]}" % (o_, i+1, i+1)]
+        i = routes[o]
+        o_ = chr(o+65)
+        s = ("Mon%s: {" % (o_))
+        s += ("DviIn=%d" % (i+1))
+        s += " , Hpd=0 , DviOutEn=0 , "
+        s += ("InDDC=%d" % (i+1))
+        s += " , DDC-Master=0 PreEmphasis=0 [db]}"
+        S += [s]
     return '\r'.join(S)
+
+
 def _parseRoutingMatrixString(s):
-    routes={}
+    routes = {}
     if not s:
         return routes
     pat = r"^Mon(?P<output>[A-Z]+): {DviIn=(?P<input>[0-9]+) ,.*}$"
     for x in s.split('\r'):
-        match=re.search(pat, x)
+        match = re.search(pat, x)
         if match:
-            d=match.groupdict()
+            d = match.groupdict()
             try:
-                routes[ord(d['output'])-65]=int(d['input'])-1
+                routes[ord(d['output'])-65] = int(d['input'])-1
             except (KeyError, TypeError, ValueError):
                 pass
     return routes
 
+
 def _testRoutingParser():
-    r0=_makeRandomRoutes()
-    rs=_getRoutingMatrixUnparsed(r0)
-    r1=_parseRoutingMatrixString(rs)
+    r0 = _makeRandomRoutes()
+    rs = _getRoutingMatrixUnparsed(r0)
+    r1 = _parseRoutingMatrixString(rs)
     if r0 == r1:
         print("%d bytes match: %s" % (len(rs), r0))
+
 
 def getConfigFile():
     if os.name == "nt":
         from win32com.shell import shellcon, shell
-        appdatadir=os.path.join(shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0),
-                                "DVImatrix848")
+        appdatadir = os.path.join(
+            shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0),
+            "DVImatrix848")
     else:
-        appdatadir = os.path.join(os.path.expanduser("~"), ".config", "DVImatrix848")
+        appdatadir = os.path.join(
+            os.path.expanduser("~"),
+            ".config",
+            "DVImatrix848")
     if not os.path.isdir(appdatadir):
         os.mkdir(appdatadir)
     return os.path.join(appdatadir, "setup.json")
 
+
 class communicator(object):
     def __init__(self):
         super(communicator, self).__init__()
-        self.serial=None
-        self.connectTime=None
+        self.serial = None
+        self.connectTime = None
 
     def send(self, data, readback=None):
-        ## 'readback' controls a subsequent 'read' operation
-        ## - positive ints:
+        # 'readback' controls a subsequent 'read' operation
+        # - positive ints:
         print("TODO: write '%s'" % (data))
-        #return
 
-        ## send data to the device
-        ## will block if we have just opened the device
+        # send data to the device
+        # will block if we have just opened the device
 
         if not self.serial or not self.connectTime:
                 return None
-        ser=self.serial
+        ser = self.serial
 
-        ## make sure there are no left-overs in the input buffers
-        ## (important for parsing readback)
+        # make sure there are no left-overs in the input buffers
+        # (important for parsing readback)
         ser.flushInput()
 
-        sleeptime=self.connectTime + 1 - time.time()
+        sleeptime = self.connectTime + 1 - time.time()
         if sleeptime > 0:
                 time.sleep(sleeptime)
         ser.write(data)
@@ -117,42 +136,47 @@ class communicator(object):
         return None
 
     def connect(self, device):
-        ## connects to another device
-        ## if we cannot connect, this throws an exception
-        print("connecting to '%s' instead of '%s'" % (device, self.getConnection()))
+        # connects to another device
+        # if we cannot connect, this throws an exception
+        print("connecting to '%s' instead of '%s'"
+              % (device, self.getConnection()))
         if device == self.getConnection():
             return
-        self.connectTime=None
-        self.serial=serial.Serial(port=device,
-                                  baudrate=19200, bytesize=8, parity='N', stopbits=1,
-                                  timeout=1 ## untested
-                                  )
-        #self.serial.flowControl(False)
-        self.connectTime=time.time()
+        self.connectTime = None
+        self.serial = serial.Serial(
+            port=device,
+            baudrate=19200, bytesize=8, parity='N', stopbits=1,
+            timeout=1  # untested
+            )
+        # self.serial.flowControl(False)
+        self.connectTime = time.time()
         print("connected to '%s'" % self.getConnection())
+
     def getConnection(self):
-        ## gets the name of the current connection
-        ## returns None if there is no open connection
+        # gets the name of the current connection
+        # returns None if there is no open connection
         if self.serial and self.serial.portstr:
             return self.serial.portstr
         return None
+
     def route(self, input, output):
-        ## tells the matrix to choose 'input' as an input for 'output'
-        ## might block
+        # tells the matrix to choose 'input' as an input for 'output'
+        # might block
         if not self.serial:
                 return None
-        command=chr(65+output)
-        command+=('%s' % (1+input))
-        command+='\r'
+        command = chr(65+output)
+        command += ('%s' % (1+input))
+        command += '\r'
         self.send(command)
+
     def getRoutes(self):
-        ## gets all outputs with their selected inputs (as a dictionary)
-        ## might block
+        # gets all outputs with their selected inputs (as a dictionary)
+        # might block
         if not self.serial:
             return None
-        command='m\r'
-        res=self.send(command, 673)
-        d=_parseRoutingMatrixString(res)
+        command = 'm\r'
+        res = self.send(command, 673)
+        d = _parseRoutingMatrixString(res)
         return d
 
 
@@ -162,26 +186,26 @@ class DVImatrix848(QtGui.QMainWindow):
                  fetchMatrix=FETCHMATRIX_ALWAYS
                  ):
         super(DVImatrix848, self).__init__()
-        self.whenFetchMatrix=FETCHMATRIX_NEVER
-        self.inputs=[]
-        self.outputs=[]
-        self.configfile=None
-        self.allow_emergency_store=True
+        self.whenFetchMatrix = FETCHMATRIX_NEVER
+        self.inputs = []
+        self.outputs = []
+        self.configfile = None
+        self.allow_emergency_store = True
 
-        self.outgroup=[]
-        self.out4in={}
-        self.default_out4in={}
-        self.serialPorts=[] # array of name/menuitem pais
-        self.serialport=None
+        self.outgroup = []
+        self.out4in = {}
+        self.default_out4in = {}
+        self.serialPorts = []  # array of name/menuitem pais
+        self.serialport = None
 
-        self.comm=communicator()
+        self.comm = communicator()
 
         if configfile is None:
-            configfile=getConfigFile()
-        self.whenFetchMatrix=fetchMatrix
+            configfile = getConfigFile()
+        self.whenFetchMatrix = fetchMatrix
         self.readConfig(configfile)
 
-        self.serialSelections= QtGui.QActionGroup(self)
+        self.serialSelections = QtGui.QActionGroup(self)
         self.serialSelections.triggered.connect(self.selectSerialByMenu)
 
         self.setupStaticUI()
@@ -209,12 +233,16 @@ class DVImatrix848(QtGui.QMainWindow):
 
         self.label = QtGui.QLabel(self.groupBox)
         self.label.setText("")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
+        self.gridLayout.addWidget(
+            self.label,
+            0, 0,
+            1, 1,
+            QtCore.Qt.AlignCenter)
         self.verticalLayout.addWidget(self.groupBox)
         self.setCentralWidget(self.centralwidget)
 
         self.menubar = QtGui.QMenuBar(self)
-        #self.menubar.setGeometry(QtCore.QRect(0, 0, 168, 19))
+        # self.menubar.setGeometry(QtCore.QRect(0, 0, 168, 19))
         self.setMenuBar(self.menubar)
 
         self.menuFile = QtGui.QMenu(self.menubar)
@@ -225,7 +253,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.actionStore = QtGui.QAction(self)
         self.actionStore.setText("Store")
         self.actionStore.setStatusTip("Store an emergency routing")
-        #self.actionStore.setShortcut("Ctrl+Shift+S")
+        # self.actionStore.setShortcut("Ctrl+Shift+S")
         if not self.allow_emergency_store:
             self.actionStore.setEnabled(False)
         self.actionStore.activated.connect(self.store)
@@ -296,50 +324,59 @@ class DVImatrix848(QtGui.QMainWindow):
         else:
             self.matrixButton.setEnabled(False)
         self.matrixButton.clicked.connect(self.getMatrix)
-        self.gridLayout.addWidget(self.matrixButton, 0,0,1,1, QtCore.Qt.AlignCenter)
+        self.gridLayout.addWidget(
+            self.matrixButton,
+            0, 0,
+            1, 1,
+            QtCore.Qt.AlignCenter)
 
     def setupDynamicUI(self):
-        inputs=self.inputs
-        outputs=self.outputs
-        self.outgroup=[]
+        inputs = self.inputs
+        outputs = self.outputs
+        self.outgroup = []
 
         self.enableLabelEditing(False)
 
         for outnum, output in enumerate(outputs):
-            outgroup=QtGui.QButtonGroup(self.groupBox)
-            self.outgroup+=[outgroup]
+            outgroup = QtGui.QButtonGroup(self.groupBox)
+            self.outgroup += [outgroup]
 
             for innum, input in enumerate(inputs):
-                butn=QtGui.QRadioButton(self.groupBox)
+                butn = QtGui.QRadioButton(self.groupBox)
                 butn.setText("")
-                self.gridLayout.addWidget(butn, 1+innum, 1+outnum, 1, 1, QtCore.Qt.AlignCenter
-                                          )
+                self.gridLayout.addWidget(
+                    butn,
+                    1+innum, 1+outnum,
+                    1, 1,
+                    QtCore.Qt.AlignCenter
+                    )
                 outgroup.addButton(butn)
                 outgroup.setId(butn, innum)
                 outgroup.buttonClicked.connect(self.clickedRouting)
         self._updateTooltips()
+
     def _updateTooltips(self):
-        inputs=self.inputs
-        outputs=self.outputs
+        inputs = self.inputs
+        outputs = self.outputs
         for outnum, output in enumerate(outputs):
             for innum, input in enumerate(inputs):
-                itm=self.gridLayout.itemAtPosition(innum+1, outnum+1)
+                itm = self.gridLayout.itemAtPosition(innum+1, outnum+1)
                 if itm:
-                    wdg=itm.widget()
+                    wdg = itm.widget()
                     wdg.setToolTip(u"%s → %s" % (input, output))
                     wdg.setStatusTip(u"%s → %s" % (input, output))
 
     def _replaceWidget(self, wdg, row, col):
-        oldwdgitm=self.gridLayout.itemAtPosition(row, col)
+        oldwdgitm = self.gridLayout.itemAtPosition(row, col)
         if oldwdgitm:
-            oldwdg=oldwdgitm.widget()
+            oldwdg = oldwdgitm.widget()
             self.gridLayout.removeWidget(oldwdg)
             oldwdg.deleteLater()
         self.gridLayout.addWidget(wdg, row, col, 1, 1, QtCore.Qt.AlignCenter)
 
     def enableLabelEditing(self, enable=True):
-        inputs=self.inputs
-        outputs=self.outputs
+        inputs = self.inputs
+        outputs = self.outputs
         for innum, input in enumerate(inputs):
             if not enable:
                 inlabel = QtGui.QLabel(self.groupBox)
@@ -359,114 +396,120 @@ class DVImatrix848(QtGui.QMainWindow):
             self._updateTooltips()
 
     def editLabels(self):
-        state=self.actionEditLabels.isChecked()
+        state = self.actionEditLabels.isChecked()
         if not state:
-            newouts=[]
+            newouts = []
             for idx, _ in enumerate(self.outputs):
-                itm=self.gridLayout.itemAtPosition(0, idx+1)
+                itm = self.gridLayout.itemAtPosition(0, idx+1)
                 if itm and itm.widget():
-                    wdg=itm.widget()
-                    newouts+=[wdg.text()]
-            newins=[]
+                    wdg = itm.widget()
+                    newouts += [wdg.text()]
+            newins = []
             for idx, _ in enumerate(self.inputs):
-                itm=self.gridLayout.itemAtPosition(idx+1, 0)
+                itm = self.gridLayout.itemAtPosition(idx+1, 0)
                 if itm and itm.widget():
-                    wdg=itm.widget()
-                    newins+=[wdg.text()]
-            self.inputs=newins
-            self.outputs=newouts
+                    wdg = itm.widget()
+                    newins += [wdg.text()]
+            self.inputs = newins
+            self.outputs = newouts
 
         self.enableLabelEditing(state)
+
     def getMatrix(self):
-        routes=self.comm.getRoutes()
+        routes = self.comm.getRoutes()
         print("got matrix: %s" % (routes))
         self.setRouting(routes, False)
+
     def setRouting(self, routes, apply=True):
         print("setRouting: %s" % (routes))
         for og in self.outgroup:
             btn = og.checkedButton()
             if btn:
-                og.setExclusive(False);
+                og.setExclusive(False)
                 btn.setChecked(False)
-                og.setExclusive(True);
+                og.setExclusive(True)
         if not routes:
             return
         if apply:
-            d=routes
+            d = routes
             for o in d:
                 self.routeInput2Output(d[o], o)
             if self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC:
                 self.getMatrix()
         else:
             self.showRouting(routes)
+
     def showRouting(self, routes):
         for o in routes:
             try:
-                i=routes[o]
-                #print("input[%s] -> output[%s]" % (i,o))
-                buttons=self.outgroup[o].buttons()
+                i = routes[o]
+                # print("input[%s] -> output[%s]" % (i, o))
+                buttons = self.outgroup[o].buttons()
                 buttons[i].setChecked(True)
             except IndexError:
                 pass
+
     def clickedRouting(self, btn):
-        btngrp=btn.group()
-        innum=btngrp.checkedId()
-        outnum=-1
-        #print("outgroup: %s" % (self.outgroup))
-        for on,og in enumerate(self.outgroup):
-            #print("out[%s]=%s" % (on, og))
+        btngrp = btn.group()
+        innum = btngrp.checkedId()
+        outnum = -1
+        # print("outgroup: %s" % (self.outgroup))
+        for on, og in enumerate(self.outgroup):
+            # print("out[%s]=%s" % (on, og))
             if og is btngrp:
-                outnum=on
+                outnum = on
                 break
-        if (not outnum in self.out4in) or (self.out4in[outnum] != innum):
+        if (outnum not in self.out4in) or (self.out4in[outnum] != innum):
             self.routeInput2Output(innum, outnum)
 
     def routeInput2Output(self, innum, outnum):
         print("%s -> %s [%s]" % (outnum, innum, self.out4in))
-        self.out4in[outnum]=innum
+        self.out4in[outnum] = innum
         self.comm.route(innum, outnum)
-        #print("TODO: connect: %s -> %s" % (innum, outnum))
+        # print("TODO: connect: %s -> %s" % (innum, outnum))
 
     def rescanSerial(self):
-        lastselected=""
+        lastselected = ""
         for (name, action) in self.serialPorts:
             if action.isChecked():
-                lastselected=name
+                lastselected = name
             self.menuSerial_Ports.removeAction(action)
             self.serialSelections.removeAction(action)
-        self.serialPorts=[]
-        for (port_name,port_desc,_) in serial.tools.list_ports.comports():
-            action=QtGui.QAction(self)
+        self.serialPorts = []
+        for (port_name, port_desc, _) in serial.tools.list_ports.comports():
+            action = QtGui.QAction(self)
             action.setText(port_name)
             action.setToolTip(port_desc)
             action.setStatusTip("Use serial port: %s" % (port_desc))
-            action.setCheckable(True);
-            action.setActionGroup(self.serialSelections);
+            action.setCheckable(True)
+            action.setActionGroup(self.serialSelections)
 
             if lastselected and lastselected == port_name:
                 action.setChecked(True)
-                lastselected=None
+                lastselected = None
 
             self.menuSerial_Ports.addAction(action)
-            self.serialPorts+=[(port_name, action)]
+            self.serialPorts += [(port_name, action)]
 
         # finally activate the correct selection
         if lastselected is not None:
-            ## this means that we were not able to continue with the old selection
-            ## so just choose the first one available
-            acts=self.serialSelections.actions()
+            # this means that we were not able to continue
+            # with the old selection, so just choose the
+            # first one available
+            acts = self.serialSelections.actions()
             if acts:
                 acts[0].setChecked(True)
                 self.selectSerial()
 
     def selectSerial(self, portname=None, fetchMatrix=True):
         print("selectSerial: fetch=%s" % (fetchMatrix))
-        print("selecting %s in %s" % (portname, [x for (x,y) in self.serialPorts]))
-        for (name,action) in self.serialPorts:
+        print("selecting %s in %s"
+              % (portname, [x for (x, y) in self.serialPorts]))
+        for (name, action) in self.serialPorts:
             if portname is None:
-                selected=action.isChecked()
+                selected = action.isChecked()
             else:
-                selected=(portname == name)
+                selected = (portname == name)
             if selected:
                 print("selected serial port: %s" % (name))
                 try:
@@ -479,14 +522,15 @@ class DVImatrix848(QtGui.QMainWindow):
                     self.status("ERROR: %s" % (e))
                     action.setChecked(False)
                     self.groupBox.setEnabled(False)
-                    fetchMatrix=False
+                    fetchMatrix = False
                 break
         if fetchMatrix:
             self.getMatrix()
 
     def selectSerialByMenu(self):
-        shouldselect=bool(self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC)
-        print("selectSerial: %s =%s&%s" % (shouldselect, self.whenFetchMatrix, FETCHMATRIX_AUTOMATIC))
+        shouldselect = bool(self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC)
+        print("selectSerial: %s = %s&%s"
+              % (shouldselect, self.whenFetchMatrix, FETCHMATRIX_AUTOMATIC))
         return self.selectSerial(fetchMatrix=shouldselect)
 
     def exit(self):
@@ -494,10 +538,10 @@ class DVImatrix848(QtGui.QMainWindow):
         sys.exit()
 
     def store(self):
-        d={}
+        d = {}
         for out in self.out4in:
-            d[out]=self.out4in[out]
-        self.default_out4in=d
+            d[out] = self.out4in[out]
+        self.default_out4in = d
         print("stored default routing matrix: %s" % (self.default_out4in))
 
     def restore(self):
@@ -507,153 +551,172 @@ class DVImatrix848(QtGui.QMainWindow):
 
     def readConfig(self, configfile=None):
         if not configfile:
-            configfile=self.configfile
+            configfile = self.configfile
         if not configfile:
-            configfile='DVImatrix848.json'
+            configfile = 'DVImatrix848.json'
 
-        config=None
+        config = None
         try:
             with open(configfile, 'rb') as cf:
-                config=json.load(cf)
+                config = json.load(cf)
         except (IOError, ValueError) as e:
             self.status("WARNING: configfile error: %s" % (e))
         if not config:
-            config={}
+            config = {}
         if not isinstance(config, dict):
-            self.status("ERROR: illegal configfile '%s'" % (configfile))
+            self.status("ERROR: illegal configfile '%s'"
+                        % (configfile))
 
         try:
-            x=config['INPUTS']
+            x = config['INPUTS']
             if isinstance(x, list):
-                self.inputs=x
+                self.inputs = x
         except KeyError:
-            self.status("WARNING: no 'INPUTS' in configuration %s" % (configfile))
-            self.inputs=[ 'IN#%s' % x for x in range(8) ]
+            self.status("WARNING: no 'INPUTS' in configuration %s"
+                        % (configfile))
+            self.inputs = ['IN#%s' % x for x in range(8)]
         try:
-            x=config['OUTPUTS']
+            x = config['OUTPUTS']
             if isinstance(x, list):
-                self.outputs=x
+                self.outputs = x
         except KeyError:
-            self.status("WARNING: no 'OUTPUTS' in configuration %s" % (configfile))
-            self.outputs=[ 'OUT#%s' % x for x in range(8) ]
+            self.status("WARNING: no 'OUTPUTS' in configuration %s"
+                        % (configfile))
+            self.outputs = ['OUT#%s' % x for x in range(8)]
 
         try:
-            d=config['serial']
-            self.serialport=d['port']
+            d = config['serial']
+            self.serialport = d['port']
         except (KeyError, TypeError) as e:
-            self.status("WARNING: no 'serial' configuration %s" % (configfile))
+            self.status("WARNING: no 'serial' configuration %s"
+                        % (configfile))
 
-        wf=FETCHMATRIX_ALWAYS
+        wf = FETCHMATRIX_ALWAYS
         try:
-            d=config['generic']
+            d = config['generic']
             if 'fetchstate' in d:
-                whenfetch=str(d['fetchstate']).lower()
+                whenfetch = str(d['fetchstate']).lower()
                 if whenfetch.startswith('never'):
-                    wf=FETCHMATRIX_NEVER
+                    wf = FETCHMATRIX_NEVER
                 if whenfetch.startswith('auto'):
-                    wf=FETCHMATRIX_AUTOMATIC
+                    wf = FETCHMATRIX_AUTOMATIC
                 if whenfetch.startswith('inter'):
-                    wf=FETCHMATRIX_INTERACTIVE
+                    wf = FETCHMATRIX_INTERACTIVE
             else:
-                self.status("WARNING: no 'generic/fetchstate' configuration %s" % (configfile))
+                self.status("WARNING: no 'generic/fetchstate' configuration %s"
+                            % (configfile))
             if 'emergencystore' in d:
                 if d['emergencystore']:
-                    self.allow_emergency_store=True
+                    self.allow_emergency_store = True
                 else:
-                    self.allow_emergency_store=False
+                    self.allow_emergency_store = False
             else:
-                self.status("WARNING: no 'generic/fetchstate' configuration %s" % (configfile))
+                self.status("WARNING: no 'generic/fetchstate' configuration %s"
+                            % (configfile))
 
         except (KeyError, TypeError) as e:
-            self.status("WARNING: no 'generic' configuration %s" % (configfile))
-        self.whenFetchMatrix=wf
+            self.status("WARNING: no 'generic' configuration %s"
+                        % (configfile))
+        self.whenFetchMatrix = wf
 
         try:
-            d=config['matrix']
+            d = config['matrix']
             if d:
-                routes={}
-                ## fix the keys: we want int, not strings
+                routes = {}
+                # fix the keys: we want int, not strings
                 for k in d:
                     try:
-                        routes[int(k)]=d[k]
+                        routes[int(k)] = d[k]
                     except (ValueError):
                         pass
-                self.out4in=routes
+                self.out4in = routes
                 print("configmatrix: %s" % (routes))
         except (KeyError, TypeError) as e:
             self.status("WARNING: no 'matrix' configuration %s" % (configfile))
 
         try:
-            d=config['defaultmatrix']
+            d = config['defaultmatrix']
             if d:
-                routes={}
-                ## fix the keys: we want int, not strings
+                routes = {}
+                # fix the keys: we want int, not strings
                 for k in d:
                     try:
-                        routes[int(k)]=d[k]
+                        routes[int(k)] = d[k]
                     except (ValueError):
                         pass
-                self.default_out4in=routes
+                self.default_out4in = routes
                 print("defaultmatrix: %s" % (routes))
         except (KeyError, TypeError) as e:
-            self.status("WARNING: no 'defaultmatrix' configuration %s" % (configfile))
+            self.status("WARNING: no 'defaultmatrix' configuration %s"
+                        % (configfile))
 
-        self.configfile=configfile
+        self.configfile = configfile
+
     def writeConfig(self, configfile=None):
         if not configfile:
-            configfile=self.configfile
+            configfile = self.configfile
         if not configfile:
-            configfile='DVImatrix848.json'
+            configfile = 'DVImatrix848.json'
 
-        d={}
+        d = {}
 
-        d_generic={}
-        whenfetch='always'
+        d_generic = {}
+        whenfetch = 'always'
         if self.whenFetchMatrix == FETCHMATRIX_NEVER:
-            whenfetch='never'
+            whenfetch = 'never'
         elif self.whenFetchMatrix == FETCHMATRIX_AUTOMATIC:
-            whenfetch='auto'
+            whenfetch = 'auto'
         elif self.whenFetchMatrix == FETCHMATRIX_INTERACTIVE:
-            whenfetch='interactive'
-        d_generic['fetchstate']=whenfetch
-        d_generic['emergencystore']=self.allow_emergency_store
+            whenfetch = 'interactive'
+        d_generic['fetchstate'] = whenfetch
+        d_generic['emergencystore'] = self.allow_emergency_store
 
-        d['generic']=d_generic
+        d['generic'] = d_generic
 
-        serialconf={}
-        portname=self.comm.getConnection()
+        serialconf = {}
+        portname = self.comm.getConnection()
         if portname:
-            serialconf['port']=portname
+            serialconf['port'] = portname
         if serialconf:
-            d['serial']=serialconf
-        print("portname='%s'\nserialconf=%s\nconf=%s" % (portname, serialconf, d))
+            d['serial'] = serialconf
+        print("portname = '%s'\nserialconf = %s\nconf = %s"
+              % (portname, serialconf, d))
 
         if self.inputs:
-            d['INPUTS']=self.inputs
+            d['INPUTS'] = self.inputs
         if self.outputs:
-            d['OUTPUTS']=self.outputs
+            d['OUTPUTS'] = self.outputs
         if self.out4in:
-            d['matrix']=self.out4in
+            d['matrix'] = self.out4in
         if self.default_out4in:
-            d['defaultmatrix']=self.default_out4in
+            d['defaultmatrix'] = self.default_out4in
 
         with open(configfile, 'wb') as cf:
             json.dump(d, cf,
                       indent=4,
-                      ensure_ascii=True,
-            )
+                      ensure_ascii=True
+                      )
+
     def openHelp(self):
-        QtGui.QDesktopServices.openUrl('https://github.com/iem-projects/DVImatrix848/wiki')
+        QtGui.QDesktopServices.openUrl(
+            'https://github.com/iem-projects/DVImatrix848/wiki')
+
     def status(self, text):
         self.statusBar().showMessage(text)
         print("STATE: %s" % text)
+
+
 if __name__ == '__main__':
-    ## the following is a pre-calculated type5 UUID
-    ## appGuid=str(uuid.uuid5(uuid.NAMESPACE_DNS, 'github.com/iem-projects/DVImatrix848'))
-    appGuid='78cf6144-49c4-5a01-ade8-db93316aff6c'
+    # the following is a pre-calculated type5 UUID
+    # appGuid = str(
+    #     uuid.uuid5(
+    #         uuid.NAMESPACE_DNS,
+    #         'github.com/iem-projects/DVImatrix848'))
+    appGuid = '78cf6144-49c4-5a01-ade8-db93316aff6c'
 
     app = QtSingleApplication(appGuid, sys.argv)
-    if app.isRunning(): sys.exit(0)
+    if app.isRunning():
+        sys.exit(0)
 
     window = DVImatrix848(fetchMatrix=FETCHMATRIX_NEVER)
     app.setActivationWindow(window)

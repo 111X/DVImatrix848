@@ -2,6 +2,7 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtNetwork import *
 
+
 class QtSingleApplication(QApplication):
 
     messageReceived = Signal(unicode)
@@ -41,7 +42,7 @@ class QtSingleApplication(QApplication):
     def activationWindow(self):
         return self._activationWindow
 
-    def setActivationWindow(self, activationWindow, activateOnMessage = True):
+    def setActivationWindow(self, activationWindow, activateOnMessage=True):
         self._activationWindow = activationWindow
         self._activateOnMessage = activateOnMessage
 
@@ -75,5 +76,6 @@ class QtSingleApplication(QApplication):
     def _onReadyRead(self):
         while True:
             msg = self._inStream.readLine()
-            if not msg: break
+            if not msg:
+                break
             self.messageReceived.emit(msg)

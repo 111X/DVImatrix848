@@ -9,10 +9,11 @@ try:
         import py2exe.mf as modulefinder
     except ImportError:
         import modulefinder
-    import win32com, sys
+    import win32com
+    import sys
     for p in win32com.__path__[1:]:
         modulefinder.AddPackagePath("win32com", p)
-    for extra in ["win32com.shell"]: #,"win32com.mapi"
+    for extra in ["win32com.shell"]:  # ,"win32com.mapi"
         __import__(extra)
         m = sys.modules[extra]
         for p in m.__path__[1:]:
@@ -25,15 +26,20 @@ from distutils.core import setup
 import os
 from glob import glob
 
+
 def getMSVCfiles():
-    ## urgh, find the msvcrt redistributable DLLs
-    ## either it's in the MSVC90 application folder
-    ## or in some winsxs folder
-    program_path=os.path.expandvars('%ProgramFiles%')
-    winsxs_path=os.path.expandvars('%SystemRoot%\WinSXS')
-    msvcrt_paths=[(r'%s\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT' % program_path)]
-    ## python2.7 seems to be built against VC90 (9.0.21022), so let's try that
-    msvcrt_paths+=glob(r'%s\x86_microsoft.vc90.crt_*_9.0.21022.8_*_*' "\\" % winsxs_path)
+    # urgh, find the msvcrt redistributable DLLs
+    # either it's in the MSVC90 application folder
+    # or in some winsxs folder
+    program_path = os.path.expandvars('%ProgramFiles%')
+    winsxs_path = os.path.expandvars('%SystemRoot%\WinSXS')
+    msvcrt_paths = [
+        (r'%s\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT'
+         % program_path)]
+    # python2.7 seems to be built against VC90 (9.0.21022), so let's try that
+    msvcrt_paths += glob(
+        r'%s\x86_microsoft.vc90.crt_*_9.0.21022.8_*_*' "\\" % winsxs_path
+        )
     for p in msvcrt_paths:
         if os.path.exists(os.path.join(p, 'msvcp90.dll')):
             sys.path.append(p)
@@ -43,17 +49,18 @@ def getMSVCfiles():
 
 def getSVGLIBfiles():
     import PySide
-    return glob(os.path.join(os.path.dirname(os.path.realpath(PySide.__file__)),
-                             'plugins', 'imageformats',
-                             '*svg*.dll'))
+    return glob(
+        os.path.join(
+            os.path.dirname(os.path.realpath(PySide.__file__)),
+            'plugins', 'imageformats', '*svg*.dll'))
 
 if os.name == 'nt':
-    data_files=[]
-    f=getMSVCfiles()
+    data_files = []
+    f = getMSVCfiles()
     if f:
         data_files += [("Microsoft.VC90.CRT", f)]
 
-    f=getSVGLIBfiles()
+    f = getSVGLIBfiles()
     if f:
         data_files += [("imageformats", f)]
 
@@ -68,10 +75,10 @@ if os.name == 'nt':
         options={"py2exe": {
             "includes": ['PySide.QtSvg', 'PySide.QtXml'],
             "bundle_files": 3,
-#            "optimize": 2,
-#            "compressed": True
+            #            "optimize": 2,
+            #            "compressed": True
             }
         },
         zipfile=None,
         )
-    #setup(console=['DVImatrix848.py'])
+    #       setup(console=['DVImatrix848.py'])
