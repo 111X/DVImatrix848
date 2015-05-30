@@ -1,6 +1,14 @@
-# DVImatrix848
+DVImatrix848
+============
 
 simple control program for the [Gefen EXT-DVI-848](http://www.gefen.com/kvm/ext-dvi-848.jsp?prod_id=5311), an 8x8 routing matrix for DVI-signals.
+
+
+## Usage
+
+Documentation can be found in the [wiki](https://github.com/iem-projects/DVImatrix848/wiki)
+
+# Deployment
 
 ##Building a standalong application on W32
 
@@ -17,6 +25,8 @@ Once everything is in place, run:
 ~~~bash
 python.exe .\setup.py py2exe
 ~~~
+
+# technical information
 
 ##Gefen EXT-DVI-848
 Documentation about the device can be found at http://www.gefen.com/pdf/EXT-DVI-848.pdf
