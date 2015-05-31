@@ -183,7 +183,8 @@ class communicator(object):
 class DVImatrix848(QtGui.QMainWindow):
     def __init__(self,
                  configfile=None,
-                 fetchMatrix=FETCHMATRIX_ALWAYS
+                 fetchMatrix=FETCHMATRIX_ALWAYS,
+                 restore=False
                  ):
         super(DVImatrix848, self).__init__()
         self.whenFetchMatrix = FETCHMATRIX_NEVER
@@ -223,6 +224,8 @@ class DVImatrix848(QtGui.QMainWindow):
             self.setRouting(self.out4in)
             self.showRouting(self.out4in)
         print("when: %s" % self.whenFetchMatrix)
+        if restore:
+            self.restore()
 
     def setupStaticUI(self):
         self.resize(320, 240)
