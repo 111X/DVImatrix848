@@ -1,4 +1,4 @@
-DVImatrix848.ico:
+all: DVImatrix848.ico DVImatrix848key.ico
 
 
 %.ico: %.png
