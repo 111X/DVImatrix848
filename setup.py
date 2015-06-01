@@ -54,6 +54,15 @@ def getSVGLIBfiles():
             os.path.dirname(os.path.realpath(PySide.__file__)),
             'plugins', 'imageformats', '*svg*.dll'))
 
+
+def getCACERTfiles():
+    import requests
+    return glob(
+        os.path.join(
+            os.path.dirname(os.path.realpath(requests.__file__)),
+            '*.pem'))
+    
+
 if os.name == 'nt':
     data_files = []
     f = getMSVCfiles()
@@ -63,6 +72,10 @@ if os.name == 'nt':
     f = getSVGLIBfiles()
     if f:
         data_files += [("imageformats", f)]
+
+    f = getCACERTfiles()
+    if f:
+        data_files += [("", f)]
 
     data_files += [('media', glob(r'media\*.*'))]
 
