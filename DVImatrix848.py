@@ -145,8 +145,8 @@ def _makeShortCut(destination, source, workingDir=None, icon=None):
     except com_error as e:
         print("unable to create shortcut '%s': %s" % (destination, e))
         return False
-    shortcut.Targetpath = target
-    shortcut.WorkingDirectory = wDir
+    shortcut.Targetpath = source
+    shortcut.WorkingDirectory = workingDir
     shortcut.IconLocation = icon
     try:
         shortcut.save()
@@ -474,7 +474,7 @@ class DVImatrix848(QtGui.QMainWindow):
             self.actionInstallHotkey.setStatusTip("Disable global emergency hotkey permanently")
 
     def installHotkeyAutostart(self):
-        installHotKeyAutostart()
+        installHotkeyAutostart()
         self.configureHotkeyMenu()
 
     def _updateTooltips(self):
