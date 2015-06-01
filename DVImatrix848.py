@@ -173,7 +173,8 @@ def installHotkeyAutostart():
         try:
             os.remove(targetpath)
         except Exception as e:
-            print("OOPS[%s] removing autostart shortcut failed: %s" % (type(e), e))
+            print("OOPS[%s] removing autostart shortcut failed: %s"
+                  % (type(e), e))
             return False
         return True
     else:
@@ -190,7 +191,11 @@ def installHotkeyAutostart():
             'media'
             'DVImatrix848key.ico',
             )
-        return _makeShortCut(targetpath, source, workingDir=sourcedir, icon=icon)
+        return _makeShortCut(
+            targetpath,
+            source,
+            workingDir=sourcedir,
+            icon=icon)
     return False
 
 
@@ -396,7 +401,8 @@ class DVImatrix848(QtGui.QMainWindow):
         hotkeyshortcut = getHotkeyShortcut()
         if hotkeyshortcut:
             self.actionInstallHotkey = QtGui.QAction(self)
-            self.actionInstallHotkey.activated.connect(self.installHotkeyAutostart)
+            self.actionInstallHotkey.activated.connect(
+                self.installHotkeyAutostart)
             self.menuConfiguration.addAction(self.actionInstallHotkey)
         self.configureHotkeyMenu()
 
@@ -480,11 +486,15 @@ class DVImatrix848(QtGui.QMainWindow):
                 enable = False
 
         if enable:
-            self.actionInstallHotkey.setText("Install global Hotkey")
-            self.actionInstallHotkey.setStatusTip("Enable global emergency hotkey permanently")
+            self.actionInstallHotkey.setText(
+                "Install global Hotkey")
+            self.actionInstallHotkey.setStatusTip(
+                "Enable global emergency hotkey permanently")
         else:
-            self.actionInstallHotkey.setText("Uninstall global Hotkey")
-            self.actionInstallHotkey.setStatusTip("Disable global emergency hotkey permanently")
+            self.actionInstallHotkey.setText(
+                "Uninstall global Hotkey")
+            self.actionInstallHotkey.setStatusTip(
+                "Disable global emergency hotkey permanently")
 
     def installHotkeyAutostart(self):
         installHotkeyAutostart()
@@ -878,8 +888,14 @@ class aboutBox(QtGui.QDialog):
         """
 
         self.set()
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.reject)
+        QtCore.QObject.connect(
+            self.buttonBox,
+            QtCore.SIGNAL("accepted()"),
+            self.accept)
+        QtCore.QObject.connect(
+            self.buttonBox,
+            QtCore.SIGNAL("rejected()"),
+            self.reject)
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def set(self, current_version=None, github_version=None):
