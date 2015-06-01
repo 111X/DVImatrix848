@@ -706,7 +706,8 @@ class DVImatrix848(QtGui.QMainWindow):
         self.statusBar().showMessage(text)
         print("STATE: %s" % text)
 
-## cmdline arguments
+
+# cmdline arguments
 def parseCmdlineArgs():
     import argparse
     parser = argparse.ArgumentParser()
@@ -716,6 +717,7 @@ def parseCmdlineArgs():
                         help="Restore emergency routing at startup")
     args = parser.parse_args()
     return args
+
 
 if __name__ == '__main__':
     # the following is a pre-calculated type5 UUID
@@ -728,9 +730,12 @@ if __name__ == '__main__':
     app = QtSingleApplication(appGuid, sys.argv)
     if app.isRunning():
         sys.exit(0)
-    args=parseCmdlineArgs()
+    args = parseCmdlineArgs()
 
-    window = DVImatrix848(fetchMatrix=FETCHMATRIX_NEVER, configfile=args.config, restore=args.restore)
+    window = DVImatrix848(
+        fetchMatrix=FETCHMATRIX_NEVER,
+        configfile=args.config,
+        restore=args.restore)
     app.setActivationWindow(window)
     window.show()
     # Run the main Qt loop
