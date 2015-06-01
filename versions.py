@@ -20,6 +20,14 @@
 
 from distutils.version import LooseVersion
 
+import os.path
+import sys
+_SCRIPTDIR=os.path.dirname(os.path.abspath(sys.argv[0]))
+CACERT=os.path.join(_SCRIPTDIR, 'cacert.pem')
+if not os.path.exists(CACERT):
+    CACERT=True
+
+print("versions: %s" % (sys.argv[0]))
 
 def _stripVersionString(version_string):
     if version_string.startswith('v'):
@@ -51,7 +59,7 @@ def getGithubVersion(project):
     import requests
     url = ("https://api.github.com/repos/%s/releases" % project)
     try:
-        r = requests.get(url)
+        r = requests.get(url, verify=CACERT)
     except requests.exceptions.ConnectionError:
         return None
     try:
