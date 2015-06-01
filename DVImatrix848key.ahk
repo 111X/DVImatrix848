@@ -35,12 +35,12 @@ Return
 
 ; for testing::
 ; ^j::
-; MsgBox, window found
-
+;  MsgBox, window found (%A_ScriptDir%)
+; Return
 
 
 #IfWinExist
-; case#2: DVImatrix848 is NOTrunning
+; case#2: DVImatrix848 is NOT running
 
 ScrollLock::
 if (A_PriorHotkey <> "ScrollLock" or A_TimeSincePriorHotkey > 400)
@@ -55,5 +55,6 @@ Return
 
 ; for testing::
 ; ^j::
-; MsgBox, window not found
+;  MsgBox, window not found (%A_ScriptDir%)
+; Return
 
