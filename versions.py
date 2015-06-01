@@ -76,7 +76,7 @@ def getGithubVersion(project):
 def getCurrentVersion():
     data = None
     try:
-        with open('version.txt') as f:
+        with open(os.path.join(_SCRIPTDIR, 'version.txt')) as f:
             data = f.read()
     except IOError:
         return None
