@@ -98,6 +98,7 @@ def _getAppDataDir():
             return ad
     return None
 
+
 def getConfigFile():
     appdatadir = _getAppDataDir()
     if not appdatadir:
@@ -107,10 +108,11 @@ def getConfigFile():
         os.mkdir(appdatadir)
     return os.path.join(appdatadir, "setup.json")
 
+
 def getHotkeyShortcut():
-    ## calculate austartdir
+    # calculate autostartdir
     appdatadir = _getAppDataDir()
-    autostartdir=''
+    autostartdir = ''
 
     if os.name == "nt":
         autostartdir = os.path.join(
@@ -131,6 +133,7 @@ def getHotkeyShortcut():
     if not os.path.isdir(autostartdir):
         return None
     return targetpath
+
 
 def _makeShortCut(destination, source, workingDir=None, icon=None):
     # destination: r'C:\tmp\test.lnk'
@@ -162,7 +165,7 @@ def installHotkeyAutostart():
     """
     installs an autostart entry for the hotkey script
     """
-    targetpath=getHotkeyShortcut()
+    targetpath = getHotkeyShortcut()
     if not targetpath:
         return False
     if os.path.exists(targetpath):
@@ -463,10 +466,10 @@ class DVImatrix848(QtGui.QMainWindow):
             return
 
         if enable is None:
-            enable=True
-            hotkeyshortcut=getHotkeyShortcut()
+            enable = True
+            hotkeyshortcut = getHotkeyShortcut()
             if hotkeyshortcut and os.path.exists(hotkeyshortcut):
-                enable=False
+                enable = False
 
         if enable:
             self.actionInstallHotkey.setText("Install global Hotkey")
@@ -828,17 +831,18 @@ class DVImatrix848(QtGui.QMainWindow):
 
 
 def printVersion(name):
-    current_version=versions.getCurrentVersion()
-    github_version=versions.getGithubVersion("iem-projects/DVImatrix848")
-    versionstring=''
+    current_version = versions.getCurrentVersion()
+    github_version = versions.getGithubVersion("iem-projects/DVImatrix848")
+    versionstring = ''
     if current_version:
-        versionstring+=(" %s" % (current_version))
+        versionstring += (" %s" % (current_version))
     if github_version and github_version != current_version:
-        versionstring+=(" [%s]" % (github_version))
+        versionstring += (" [%s]" % (github_version))
     if versionstring:
         print("%s:%s" % (name, versionstring))
     else:
         print("%s: unknown version")
+
 
 # cmdline arguments
 def parseCmdlineArgs():
