@@ -26,6 +26,23 @@ Once everything is in place, run:
 python.exe ./setup.py py2exe
 ~~~
 
+This will
+
+##Creating a hotkey application
+
+This requires [AutoHostKey](http://ahkscript.org/)
+
+- Launch the `Convert .ahk to .exe` utility
+- Select the `DVImatrix848key.ahk` script as *Source*
+- Select `dist/DVImatrix848key.exe` as *Destination*
+- Select `media/DVImatrix848key.ico` as the *Custom Icon*
+- Click <key>Convert</key>
+
+## bundling it all up
+- Move the `dist` folder to `DVImatrix848`
+- ZIP it
+
+
 #Technical information
 
 ##Gefen EXT-DVI-848
