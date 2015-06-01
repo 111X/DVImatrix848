@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright © 2014, IOhannes m zmölnig, IEM
+# Copyright © 2014-2015, IOhannes m zmölnig, IEM
 
-# This file is part of HDMIports
+# This file is part of DVImatrix848
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with DVImatrix848.  If not, see <http://www.gnu.org/licenses/>.
+
 from PySide import QtGui, QtCore
 from QtSingleApplication import QtSingleApplication
 
