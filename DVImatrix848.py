@@ -161,7 +161,7 @@ def installHotkeyAutostart():
     installs an autostart entry for the hotkey script
     """
     targetpath=getHotkeyShortcut()
-    if not hotkeyshortcut:
+    if not targetpath:
         return False
     if os.path.exists(targetpath):
         # delete it
@@ -463,7 +463,7 @@ class DVImatrix848(QtGui.QMainWindow):
         if enable is None:
             enable=True
             hotkeyshortcut=getHotkeyShortcut()
-            if hotkeyshortcut and os.path.exists(hostkeyshortcut):
+            if hotkeyshortcut and os.path.exists(hotkeyshortcut):
                 enable=False
 
         if enable:
