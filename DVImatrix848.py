@@ -166,7 +166,7 @@ def installHotkeyAutostart():
     if os.path.exists(targetpath):
         # delete it
         try:
-            os.delete(targetpath)
+            os.remove(targetpath)
         except Exception as e:
             print("OOPS[%s] removing autostart shortcut failed: %s" % (type(e), e))
             return False
