@@ -20,6 +20,7 @@
 
 from PySide import QtGui, QtCore
 from QtSingleApplication import QtSingleApplication
+import versions
 
 import os
 import sys
@@ -826,6 +827,19 @@ class DVImatrix848(QtGui.QMainWindow):
         print("STATE: %s" % text)
 
 
+def printVersion(name):
+    current_version=versions.getCurrentVersion()
+    github_version=versions.getGithubVersion("iem-projects/DVImatrix848")
+    versionstring=''
+    if current_version:
+        versionstring+=(" %s" % (current_version))
+    if github_version and github_version != current_version:
+        versionstring+=(" [%s]" % (github_version))
+    if versionstring:
+        print("%s:%s" % (name, versionstring))
+    else:
+        print("%s: unknown version")
+
 # cmdline arguments
 def parseCmdlineArgs():
     import argparse
@@ -834,6 +848,8 @@ def parseCmdlineArgs():
                         help="Configuration file to read")
     parser.add_argument('-r', '--restore', action='store_true',
                         help="Restore emergency routing at startup")
+    parser.add_argument('-V', '--version', action='store_true',
+                        help="print program version and exit")
     args = parser.parse_args()
     return args
 
@@ -850,6 +866,9 @@ if __name__ == '__main__':
     if app.isRunning():
         sys.exit(0)
     args = parseCmdlineArgs()
+    if args.version:
+        printVersion(sys.argv[0])
+        sys.exit(0)
 
     window = DVImatrix848(
         fetchMatrix=FETCHMATRIX_NEVER,
