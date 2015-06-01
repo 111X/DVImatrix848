@@ -83,17 +83,25 @@ def _testRoutingParser():
         print("%d bytes match: %s" % (len(rs), r0))
 
 
-def getConfigFile():
-    if os.name == "nt":
+def _getAppDataDir():
+    appdatadir = []
+    if os.name == 'nt':
         from win32com.shell import shellcon, shell
-        appdatadir = os.path.join(
-            shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0),
-            "DVImatrix848")
-    else:
-        appdatadir = os.path.join(
-            os.path.expanduser("~"),
-            ".config",
-            "DVImatrix848")
+        appdatadir += [shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0)]
+    appdatadir += [
+        os.path.join(os.path.expanduser("~"), ".config")
+        ]
+    for ad in appdatadir:
+        if os.path.exists(ad):
+            return ad
+    return None
+
+
+def getConfigFile():
+    appdatadir = _getAppDataDir()
+    if not appdatadir:
+        return
+    appdatadir = os.path.join(appdatadir, "DVImatrix848")
     if not os.path.isdir(appdatadir):
         os.mkdir(appdatadir)
     return os.path.join(appdatadir, "setup.json")
