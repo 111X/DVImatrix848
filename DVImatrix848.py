@@ -107,6 +107,32 @@ def getConfigFile():
     return os.path.join(appdatadir, "setup.json")
 
 
+def _makeShortCut(destination, source, workingDir=None, icon=None):
+    # destination: r'C:\tmp\test.lnk'
+    # source     : r'C:\Program Files\DVImatrix848\DVImatrix.exe'
+    # workingDir : r'C:\Program Files\DVImatrix848'
+    # icon       : r'C:\Program Files\DVImatrix848\test.ico'
+    import os
+    from win32com.client import Dispatch
+    from pythoncom import com_error
+
+    shell = Dispatch('WScript.Shell')
+    try:
+        shortcut = shell.CreateShortCut(destination)
+    except com_error as e:
+        print("unable to create shortcut '%s': %s" % (destination, e))
+        return False
+    shortcut.Targetpath = target
+    shortcut.WorkingDirectory = wDir
+    shortcut.IconLocation = icon
+    try:
+        shortcut.save()
+    except com_error as e:
+        print("unable to save shortcut '%s': %s" % (destination, e))
+        return False
+    return True
+
+
 class communicator(object):
     def __init__(self):
         super(communicator, self).__init__()
