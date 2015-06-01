@@ -158,33 +158,35 @@ def _makeShortCut(destination, source, workingDir=None, icon=None):
 
 def installHotkeyAutostart():
     """
-    installs a shortcut to the
+    installs an autostart entry for the hotkey script
     """
-    if os.name != "nt":
-        # nothing to do on non-w32
-        return False
-    sourcedir = os.path.dirname(os.path.abspath(__file__))
-    source = os.path.join(
-        sourcedir,
-        'DVImatrix848key.exe',
-        )
-    if not os.path.exists(source):
-        return False
     targetpath=getHotkeyShortcut()
-    if not targetpath:
+    if not hotkeyshortcut:
         return False
-    if not os.path.isdir(targetpath):
-        return False
-    targetpath = os.path.join(
-        targetpath,
-        'DVImatrix848 hotkey.lnk'
-        )
-    icon = os.path.join(
-        sourcedir,
-        'media'
-        'DVImatrix848key.ico',
-        )
-    return _makeShortCut(targetpath, source, workingDir=sourcedir, icon=icon)
+    if os.path.exists(targetpath):
+        # delete it
+        try:
+            os.delete(targetpath)
+        except Exception as e:
+            print("OOPS[%s] removing autostart shortcut failed: %s" % (type(e), e))
+            return False
+        return True
+    else:
+        # create a shortcut in autostart
+        sourcedir = os.path.dirname(os.path.abspath(__file__))
+        source = os.path.join(
+            sourcedir,
+            'DVImatrix848key.exe',
+            )
+        if not os.path.exists(source):
+            return False
+        icon = os.path.join(
+            sourcedir,
+            'media'
+            'DVImatrix848key.ico',
+            )
+        return _makeShortCut(targetpath, source, workingDir=sourcedir, icon=icon)
+    return False
 
 
 class communicator(object):
