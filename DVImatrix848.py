@@ -96,7 +96,6 @@ def _getAppDataDir():
             return ad
     return None
 
-
 def getConfigFile():
     appdatadir = _getAppDataDir()
     if not appdatadir:
@@ -106,6 +105,30 @@ def getConfigFile():
         os.mkdir(appdatadir)
     return os.path.join(appdatadir, "setup.json")
 
+def getHotkeyShortcut():
+    ## calculate austartdir
+    appdatadir = _getAppDataDir()
+    autostartdir=''
+
+    if os.name == "nt":
+        autostartdir = os.path.join(
+            appdatadir,
+            'Microsoft',
+            'Windows',
+            'Start Menu',
+            'Programs',
+            'Startup',
+            )
+        targetpath = os.path.join(
+            autostartdir,
+            'DVImatrix848 hotkey.lnk'
+            )
+    else:
+        # LATER: support for other OSs
+        return None
+    if not os.path.isdir(autostartdir):
+        return None
+    return targetpath
 
 def _makeShortCut(destination, source, workingDir=None, icon=None):
     # destination: r'C:\tmp\test.lnk'
@@ -147,15 +170,9 @@ def installHotkeyAutostart():
         )
     if not os.path.exists(source):
         return False
-    appdatadir = _getAppDataDir()
-    targetpath = os.path.join(
-        appdatadir,
-        'Microsoft',
-        'Windows',
-        'Start Menu',
-        'Programs',
-        'Startup',
-        )
+    targetpath=getHotkeyShortcut()
+    if not targetpath:
+        return False
     if not os.path.isdir(targetpath):
         return False
     targetpath = os.path.join(
