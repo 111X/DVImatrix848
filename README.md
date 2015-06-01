@@ -23,7 +23,7 @@ You will need a number of things installed
 Once everything is in place, run:
 
 ~~~bash
-python.exe .\setup.py py2exe
+python.exe ./setup.py py2exe
 ~~~
 
 #Technical information
