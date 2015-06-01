@@ -397,14 +397,15 @@ class DVImatrix848(QtGui.QMainWindow):
         self.actionHelp.setStatusTip("Read online help")
         self.actionHelp.activated.connect(self.openHelp)
         self.menuHelp.addAction(self.actionHelp)
-
-        self.actionInstallHotkey = QtGui.QAction(self)
-        self.actionInstallHotkey.setText("Install global Hotkey")
-        self.actionInstallHotkey.setStatusTip("Enable global emergency hotkey permanently")
-        self.actionInstallHotkey.activated.connect(installHotkeyAutostart)
-        self.menuHelp.addAction(self.actionInstallHotkey)
-
         self.menubar.addAction(self.menuHelp.menuAction())
+
+        self.actionInstallHotkey = None
+        hotkeyshortcut=getHotkeyShortcut()
+        if hotkeyshortcut:
+            self.actionInstallHotkey = QtGui.QAction(self)
+            self.actionInstallHotkey.activated.connect(installHotkeyAutostart)
+            self.menuHelp.addAction(self.actionInstallHotkey)
+        self.configureHotkeyMenu()
 
         self.statusbar = QtGui.QStatusBar(self)
         self.setStatusBar(self.statusbar)
@@ -454,6 +455,27 @@ class DVImatrix848(QtGui.QMainWindow):
                 outgroup.setId(butn, innum)
                 outgroup.buttonClicked.connect(self.clickedRouting)
         self._updateTooltips()
+
+    def configureHotkeyMenu(self, enable=None):
+        if not self.actionInstallHotkey:
+            return
+
+        if enable is None:
+            enable=True
+            hotkeyshortcut=getHotkeyShortcut()
+            if hotkeyshortcut and os.path.exists(hostkeyshortcut):
+                enable=False
+
+        if enable:
+            self.actionInstallHotkey.setText("Install global Hotkey")
+            self.actionInstallHotkey.setStatusTip("Enable global emergency hotkey permanently")
+        else:
+            self.actionInstallHotkey.setText("Uninstall global Hotkey")
+            self.actionInstallHotkey.setStatusTip("Disable global emergency hotkey permanently")
+
+    def installHotkeyAutostart(self):
+        installHotKeyAutostart()
+        self.configureHotkeyMenu()
 
     def _updateTooltips(self):
         inputs = self.inputs
@@ -617,7 +639,6 @@ class DVImatrix848(QtGui.QMainWindow):
                     action.setChecked(True)
                     self.status("serial port connected to %s" % (name))
                     self.groupBox.setEnabled(True)
-
                 except serial.serialutil.SerialException as e:
                     self.status("ERROR: %s" % (e))
                     action.setChecked(False)
