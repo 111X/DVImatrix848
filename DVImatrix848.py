@@ -378,6 +378,13 @@ class DVImatrix848(QtGui.QMainWindow):
         self.actionHelp.setStatusTip("Read online help")
         self.actionHelp.activated.connect(self.openHelp)
         self.menuHelp.addAction(self.actionHelp)
+
+        self.actionInstallHotkey = QtGui.QAction(self)
+        self.actionInstallHotkey.setText("Install global Hotkey")
+        self.actionInstallHotkey.setStatusTip("Enable global emergency hotkey permanently")
+        self.actionInstallHotkey.activated.connect(installHotkeyAutostart)
+        self.menuHelp.addAction(self.actionInstallHotkey)
+
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.statusbar = QtGui.QStatusBar(self)
