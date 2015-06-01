@@ -403,7 +403,7 @@ class DVImatrix848(QtGui.QMainWindow):
         hotkeyshortcut=getHotkeyShortcut()
         if hotkeyshortcut:
             self.actionInstallHotkey = QtGui.QAction(self)
-            self.actionInstallHotkey.activated.connect(installHotkeyAutostart)
+            self.actionInstallHotkey.activated.connect(self.installHotkeyAutostart)
             self.menuHelp.addAction(self.actionInstallHotkey)
         self.configureHotkeyMenu()
 
