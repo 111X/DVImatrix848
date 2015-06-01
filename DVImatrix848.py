@@ -173,7 +173,7 @@ def installHotkeyAutostart():
         return True
     else:
         # create a shortcut in autostart
-        sourcedir = os.path.dirname(os.path.abspath(__file__))
+        sourcedir = os.path.dirname(os.path.abspath(sys.argv[0]))
         source = os.path.join(
             sourcedir,
             'DVImatrix848key.exe',
