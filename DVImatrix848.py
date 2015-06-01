@@ -133,6 +133,43 @@ def _makeShortCut(destination, source, workingDir=None, icon=None):
     return True
 
 
+def installHotkeyAutostart():
+    """
+    installs a shortcut to the
+    """
+    if os.name != "nt":
+        # nothing to do on non-w32
+        return False
+    sourcedir = os.path.dirname(os.path.abspath(__file__))
+    source = os.path.join(
+        sourcedir,
+        'DVImatrix848key.exe',
+        )
+    if not os.path.exists(source):
+        return False
+    appdatadir = _getAppDataDir()
+    targetpath = os.path.join(
+        appdatadir,
+        'Microsoft',
+        'Windows',
+        'Start Menu',
+        'Programs',
+        'Startup',
+        )
+    if not os.path.isdir(targetpath):
+        return False
+    targetpath = os.path.join(
+        targetpath,
+        'DVImatrix848 hotkey.lnk'
+        )
+    icon = os.path.join(
+        sourcedir,
+        'media'
+        'DVImatrix848key.ico',
+        )
+    return _makeShortCut(targetpath, source, workingDir=sourcedir, icon=icon)
+
+
 class communicator(object):
     def __init__(self):
         super(communicator, self).__init__()
