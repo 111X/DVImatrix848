@@ -20,35 +20,38 @@
 
 from distutils.version import LooseVersion
 
+
 def _stripVersionString(version_string):
     if version_string.startswith('v'):
-        version_string=version_string[1:]
+        version_string = version_string[1:]
     return version_string.strip()
 
+
 def _getLatestVersion(j):
-    v=None
-    #print("latest: %s" % (j))
+    v = None
+    # print("latest: %s" % (j))
     for k in j:
         try:
-            version_string=_stripVersionString(k['tag_name'])
+            version_string = _stripVersionString(k['tag_name'])
         except TypeError:
             continue
-        vnew=LooseVersion(version_string)
+        vnew = LooseVersion(version_string)
         if not v:
-            v=vnew
+            v = vnew
         else:
 
             if vnew > v:
-                v=vnew
+                v = vnew
     if v:
         return str(v)
     return None
 
+
 def getGithubVersion(project):
     import requests
-    url=("https://api.github.com/repos/%s/releases" % project)
+    url = ("https://api.github.com/repos/%s/releases" % project)
     try:
-        r=requests.get(url)
+        r = requests.get(url)
     except requests.exceptions.ConnectionError:
         return None
     try:
@@ -56,24 +59,29 @@ def getGithubVersion(project):
     except requests.exceptions.HTTPError:
         return None
     try:
-        j=r.json()
+        j = r.json()
     except ValueError:
         return None
     return _getLatestVersion(j)
 
+
 def getCurrentVersion():
-    data=None
+    data = None
     try:
         with open('version.txt') as f:
-            data=f.read()
+            data = f.read()
     except IOError:
         return None
     if not data:
         return None
     return _stripVersionString(data.split()[-1])
 
+
 def isNewer(newversion, oldversion):
-    """returns True if newversion is newer than oldversion, None if they are the same, and False otherwise"""
+    """
+    returns True if newversion is newer than oldversion,
+    None if they are the same,
+    and False otherwise"""
     if not oldversion:
         return None
     if not newversion:
@@ -85,9 +93,10 @@ def isNewer(newversion, oldversion):
     except (TypeError, AttributeError):
         return None
 
+
 if __name__ == '__main__':
-    current_version=getCurrentVersion()
-    github_version=getGithubVersion("iem-projects/DVImatrix848")
+    current_version = getCurrentVersion()
+    github_version = getGithubVersion("iem-projects/DVImatrix848")
     if github_version:
         if current_version:
             if LooseVersion(current_version) < LooseVersion(github_version):
@@ -97,9 +106,11 @@ if __name__ == '__main__':
                 print("congrats: version '%s' is up-to-date (>=%s)"
                       % (current_version, github_version))
         else:
-            print("unable to determine current version. last released version is '%s'" % github_version)
+            print("unable to determine current version."
+                  "last released version is '%s'" % github_version)
     else:
         if current_version:
-            print("unable to determine last release. current version is '%s'" % current_version)
+            print("unable to determine last release."
+                  "current version is '%s'" % current_version)
         else:
             print("unable to determine version")
