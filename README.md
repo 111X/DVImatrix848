@@ -1,16 +1,16 @@
 DVImatrix848
 ============
 
-simple control program for the [Gefen EXT-DVI-848](http://www.gefen.com/kvm/ext-dvi-848.jsp?prod_id=5311), an 8x8 routing matrix for DVI-signals.
+a simple control program for the [Gefen EXT-DVI-848](http://www.gefen.com/kvm/ext-dvi-848.jsp?prod_id=5311),
+an 8x8 routing matrix for DVI-signals.
 
-
-## Usage
+#Usage
 
 Documentation can be found in the [wiki](https://github.com/iem-projects/DVImatrix848/wiki)
 
-# Deployment
+#Deployment
 
-##Building a standalong application on W32
+##Building a standalone application on W32
 
 You will need a number of things installed
 - Python2.7
@@ -26,12 +26,12 @@ Once everything is in place, run:
 python.exe .\setup.py py2exe
 ~~~
 
-# technical information
+#Technical information
 
 ##Gefen EXT-DVI-848
 Documentation about the device can be found at http://www.gefen.com/pdf/EXT-DVI-848.pdf
 
-The interesting parts (commands to controal the device via the serial line) can be found in *Appendix B*.
+The interesting parts (commands to control the device via the serial line) can be found in *Appendix B*.
 
 ###RS232 settings
 - Bits per second: 19200
@@ -41,8 +41,9 @@ The interesting parts (commands to controal the device via the serial line) can 
 - Flow Control: None
 
 ###Switching Command (shortcut)
-First character indicates the output monitor. Second character indicates the input
-number. E.g. to route input *5* to output monitor *A*, use:
+The first character (capital letter, starting with `A`) indicates the output monitor.
+The second character (number, starting with `1`) indicates the input device.
+E.g. to route input *5* to output monitor *A*, use:
 
     A5
 
