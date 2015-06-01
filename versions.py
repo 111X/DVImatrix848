@@ -72,6 +72,18 @@ def getCurrentVersion():
         return None
     return _stripVersionString(data.split()[-1])
 
+def isNewer(newversion, oldversion):
+    """returns True if newversion is newer than oldversion, None if they are the same, and False otherwise"""
+    if not oldversion:
+        return None
+    if not newversion:
+        return None
+    if oldversion == newversion:
+        return None
+    try:
+        return LooseVersion(oldversion) < LooseVersion(newversion)
+    except (TypeError, AttributeError):
+        return None
 
 if __name__ == '__main__':
     current_version=getCurrentVersion()
