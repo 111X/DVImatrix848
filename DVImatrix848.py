@@ -128,7 +128,7 @@ def getAutostarter(name):
         _SCRIPTDIR,
         'media',
         'DVImatrix848key.ico')
-    if not os.path.exist(icon):
+    if not os.path.exists(icon):
         icon=None
     try:
         ast.icon=icon
