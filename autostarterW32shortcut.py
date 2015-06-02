@@ -23,11 +23,11 @@ from autostarter import autostarter_base
 
 
 class autostarter(autostarter_base):
-    def __init__(self, name, executable):
+    def __init__(self, name, executable, workingDir=None, icon=None):
         super(autostarter, self).__init__(name, executable)
         self._shortcut = self.getShortcutPath(name)
-        self.workingDir = None
-        self.icon = None
+        self.workingDir = workingDir
+        self.icon = icon
 
     def exists(self):
         """returns True if there is already an autostarter called <name>"""
