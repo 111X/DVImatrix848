@@ -89,6 +89,8 @@ def build_exe():
 
 def build_ahk():
     # run ahk2exe
+    import subprocess
+
     ProgramFiles = os.path.expandvars('%ProgramFiles%')
     ahk2exe = os.path.join(
         ProgramFiles,
