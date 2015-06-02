@@ -419,13 +419,18 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menuHelp.addAction(self.actionHelp)
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        self.aboutBox = aboutBox()
-        self.actionAbout = QtGui.QAction(self)
-        self.actionAbout.setText("Check for updates")
-        self.actionAbout.setStatusTip("Check for newer versions")
-
-        self.actionAbout.activated.connect(self.about)
-        self.menuHelp.addAction(self.actionAbout)
+        self.aboutBox=None
+        try:
+            self.aboutBox = aboutBox()
+        except (IOError, ValueError, KeyError) as e:
+            # couldn't initialize aboutBox, continue without
+            print("disabling ABOUT: %s" % e)
+        if self.aboutBox:
+            self.actionAbout = QtGui.QAction(self)
+            self.actionAbout.setText("Check for updates")
+            self.actionAbout.setStatusTip("Check for newer versions")
+            self.actionAbout.activated.connect(self.about)
+            self.menuHelp.addAction(self.actionAbout)
 
         self.statusbar = QtGui.QStatusBar(self)
         self.setStatusBar(self.statusbar)
@@ -502,7 +507,8 @@ class DVImatrix848(QtGui.QMainWindow):
         self.configureHotkeyMenu()
 
     def about(self):
-        self.aboutBox.showAbout()
+        if self.aboutBox:
+            self.aboutBox.showAbout()
 
     def _updateTooltips(self):
         inputs = self.inputs
