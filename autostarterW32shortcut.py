@@ -130,7 +130,8 @@ if __name__ == '__main__':
     def runtest(starter):
         print("autostart: %s -> %s" % (starter.name, starter.executable))
         if starter.exists():
-            print("autostarter '%s' already exists. aborting test" % (starter.name))
+            print("autostarter '%s' already exists. aborting test"
+                  % (starter.name))
             return
         r = starter.create()
         x = starter.exists()
@@ -142,6 +143,9 @@ if __name__ == '__main__':
     name = 'autostart test'
     script = os.path.abspath(sys.argv[0])
     starter = autostarter(name, script)
-    starter.workingDir=os.path.dirname(script)
-    starter.icon=os.path.join(starter.workingDir, 'media', 'DVImatrix848key.ico')
+    starter.workingDir = os.path.dirname(script)
+    starter.icon = os.path.join(
+        starter.workingDir,
+        'media',
+        'DVImatrix848key.ico')
     runtest(starter)
