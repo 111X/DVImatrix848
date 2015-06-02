@@ -865,7 +865,6 @@ class aboutBox(QtGui.QDialog):
         jsonfile=os.path.join(_SCRIPTDIR, 'about.json')
         j=None
         with open(jsonfile) as f:
-            import json
             j=json.load(f)
             self.text=j['about']
             self.newrelease=j['newrelease']
