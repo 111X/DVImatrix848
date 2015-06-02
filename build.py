@@ -63,7 +63,7 @@ def getVersion(force=False):
     if tick and tick != '0':
         _VERSION = '+'.join([tagname, tick])
     else:
-        _VERSION=tagname
+        _VERSION = tagname
     if modified:
         _VERSION += '*'
     return _VERSION
@@ -130,7 +130,7 @@ def zipit():
         filename = '_'.join([basename, v])
     else:
         filename = basename
-    filename=filename.replace('*', '+')
+    filename = filename.replace('*', '+')
     shutil.make_archive(filename, 'zip', base_dir=basename)
 
 
