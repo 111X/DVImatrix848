@@ -31,6 +31,9 @@ def getMSVCfiles():
     # urgh, find the msvcrt redistributable DLLs
     # either it's in the MSVC90 application folder
     # or in some winsxs folder
+    import os
+    import sys
+    from glob import glob
     program_path = os.path.expandvars('%ProgramFiles%')
     winsxs_path = os.path.expandvars('%SystemRoot%\WinSXS')
     msvcrt_paths = [
@@ -48,6 +51,9 @@ def getMSVCfiles():
 
 
 def getSVGLIBfiles():
+    import os
+    from glob import glob
+
     import PySide
     return glob(
         os.path.join(
@@ -56,7 +62,10 @@ def getSVGLIBfiles():
 
 
 def getCACERTfiles():
+    import os
+    from glob import glob
     import requests
+
     return glob(
         os.path.join(
             os.path.dirname(os.path.realpath(requests.__file__)),
