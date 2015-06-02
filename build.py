@@ -60,7 +60,10 @@ def getVersion(force=False):
     longtag = longtag.split()[-1].split('-')
     tagname = '-'.join(longtag[0:-2])
     tick = longtag[-2]
-    _VERSION = '+'.join([tagname, tick])
+    if tick and tick != '0':
+        _VERSION = '+'.join([tagname, tick])
+    else:
+        _VERSION=tagname
     if modified:
         _VERSION += '*'
     return _VERSION
