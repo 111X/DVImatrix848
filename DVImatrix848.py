@@ -38,6 +38,7 @@ FETCHMATRIX_AUTOMATIC = 0x1
 FETCHMATRIX_INTERACTIVE = 0x2
 FETCHMATRIX_ALWAYS = FETCHMATRIX_AUTOMATIC | FETCHMATRIX_INTERACTIVE
 
+_SCRIPTDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 
 def _makeRandomRoutes():
     routes = {}
@@ -179,7 +180,7 @@ def installHotkeyAutostart():
         return True
     else:
         # create a shortcut in autostart
-        sourcedir = os.path.dirname(os.path.abspath(sys.argv[0]))
+        sourcedir = _SCRIPTDIR
         source = os.path.join(
             sourcedir,
             'DVImatrix848key.exe',
