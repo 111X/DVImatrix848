@@ -40,6 +40,7 @@ FETCHMATRIX_ALWAYS = FETCHMATRIX_AUTOMATIC | FETCHMATRIX_INTERACTIVE
 
 _SCRIPTDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 
+
 def _makeRandomRoutes():
     routes = {}
     for i in range(8):
@@ -109,6 +110,7 @@ def getConfigFile():
         os.mkdir(appdatadir)
     return os.path.join(appdatadir, "setup.json")
 
+
 def getAutostarter(name):
     try:
         from autostarterW32registry import autostarter
@@ -129,13 +131,13 @@ def getAutostarter(name):
         'media',
         'DVImatrix848key.ico')
     if not os.path.exists(icon):
-        icon=None
+        icon = None
     try:
-        ast.icon=icon
+        ast.icon = icon
     except AttributeError:
         pass
     try:
-        ast.workingDir=_SCRIPTDIR
+        ast.workingDir = _SCRIPTDIR
     except AttributeError:
         pass
     return ast
@@ -340,7 +342,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menuConfiguration.addAction(self.menuSerial_Ports.menuAction())
 
         self.actionInstallHotkey = None
-        self.autostarter=getAutostarter('DVImatrix848 hotkey')
+        self.autostarter = getAutostarter('DVImatrix848 hotkey')
         if self.autostarter:
             self.actionInstallHotkey = QtGui.QAction(self)
             self.actionInstallHotkey.activated.connect(
@@ -360,7 +362,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menuHelp.addAction(self.actionHelp)
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        self.aboutBox=None
+        self.aboutBox = None
         try:
             self.aboutBox = aboutBox()
         except (IOError, ValueError, KeyError) as e:
@@ -427,7 +429,7 @@ class DVImatrix848(QtGui.QMainWindow):
             return
 
         if enable is None:
-            enable=not self.autostarter.exists()
+            enable = not self.autostarter.exists()
 
         if enable:
             self.actionInstallHotkey.setText(
@@ -800,13 +802,13 @@ class aboutBox(QtGui.QDialog):
     def __init__(self):
         super(aboutBox, self).__init__()
 
-        jsonfile=os.path.join(_SCRIPTDIR, 'about.json')
-        j=None
+        jsonfile = os.path.join(_SCRIPTDIR, 'about.json')
+        j = None
         with open(jsonfile) as f:
-            j=json.load(f)
-            self.text=j['about']
-            self.newrelease=j['newrelease']
-            self.no_newrelease=j['no_newrelease']
+            j = json.load(f)
+            self.text = j['about']
+            self.newrelease = j['newrelease']
+            self.no_newrelease = j['no_newrelease']
 
         self.resize(465, 281)
         self.setModal(True)
@@ -839,8 +841,10 @@ class aboutBox(QtGui.QDialog):
         if not github_version:
             upstream = self.no_newrelease
         elif ((not current_version
-             or versions.isNewer(github_version, current_version))):
-            upstream = self.newrelease.replace('@UPSTREAM_VERSION@', github_version)
+               or versions.isNewer(github_version, current_version))):
+            upstream = self.newrelease.replace(
+                '@UPSTREAM_VERSION@',
+                github_version)
         if not current_version:
             current_version = '<em>unknown</em>'
         return (self.text
