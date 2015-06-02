@@ -455,7 +455,7 @@ class DVImatrix848(QtGui.QMainWindow):
             return
 
         if enable is None:
-            enable=self.autostarter.exists()
+            enable=not self.autostarter.exists()
 
         if enable:
             self.actionInstallHotkey.setText(
