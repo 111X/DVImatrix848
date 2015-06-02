@@ -70,7 +70,7 @@ def getCACERTfiles():
         os.path.join(
             os.path.dirname(os.path.realpath(requests.__file__)),
             '*.pem'))
-    
+
 
 if os.name == 'nt':
     data_files = [("", ["about.json"])]
