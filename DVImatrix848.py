@@ -111,7 +111,7 @@ def getConfigFile():
 
 def getAutostarter(name):
     try:
-        from autostarterW32shortcut import autostarter
+        from autostarterW32registry import autostarter
     except ImportError:
         return None
 
