@@ -856,6 +856,15 @@ class aboutBox(QtGui.QDialog):
     def __init__(self):
         super(aboutBox, self).__init__()
 
+        jsonfile=os.path.join(_SCRIPTDIR, 'about.json')
+        j=None
+        with open(jsonfile) as f:
+            import json
+            j=json.load(f)
+            self.text=j['about']
+            self.newrelease=j['newrelease']
+            self.no_newrelease=j['no_newrelease']
+
         self.resize(465, 281)
         self.setModal(True)
         self.verticalLayout = QtGui.QVBoxLayout(self)
@@ -865,28 +874,6 @@ class aboutBox(QtGui.QDialog):
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
         self.verticalLayout.addWidget(self.buttonBox)
-
-        # version, link-to-release
-        self.text = """
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-<html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }
-</style></head><body style=" font-family:\'Sans Serif\'; font-size:9pt; font-weight:400; font-style:normal;">
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">DVImatrix848</span></p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Version: %s</p>
-%s
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; text-decoration: underline; color:#0000ff;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&copy; 2014-2015 IOhannes m zm&ouml;lnig,</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">                      Institute of Electronic Music and Acoustics (IEM),</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">                      University of Music and Performing Arts, Graz KUG</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This program is free software; you can redistribute it and/or modify it under the terms of the <a href="http://www.gnu.org/licenses/#GPL"><span style=" text-decoration: underline; color:#0000ff;">GNU General Public License</span></a> as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p></body></html>
-        """
-
-        # upstream-version
-        self.newrelease = """
-        <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">    <a href="https://github.com/iem-projects/DVImatrix848/releases"><span style=" font-weight:600; text-decoration: underline; color:#0000ff;">There is a new version [%s] available online.</span></a></p>
-        """
 
         self.set()
         QtCore.QObject.connect(
@@ -905,12 +892,17 @@ class aboutBox(QtGui.QDialog):
 
     def _text(self, current_version=None, github_version=None):
         upstream = ''
-        if ((not current_version
+        if not github_version:
+            upstream = self.no_newrelease
+        elif ((not current_version
              or versions.isNewer(github_version, current_version))):
-            upstream = (self.newrelease % (github_version))
+            upstream = self.newrelease.replace('@UPSTREAM_VERSION@', github_version)
         if not current_version:
             current_version = '<em>unknown</em>'
-        return(self.text % (current_version, upstream))
+        return (self.text
+                .replace('@VERSION@', current_version)
+                .replace('@UPSTREAM@', upstream)
+                )
 
     def showAbout(self):
         current_version = versions.getCurrentVersion()
