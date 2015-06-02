@@ -141,34 +141,6 @@ def getAutostarter(name):
     return ast
 
 
-def _registerAutostart(name, executable):
-    import _winreg as wr
-    path=r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
-    hkcu = ConnectRegistry(None,wr.HKEY_CURRENT_USER)
-
-    aKey = OpenKey(hkcu, path, 0, KEY_WRITE)
-    result = False
-    # check whether we already have an entry <name>
-    v=None
-    try:
-        v=wr.QueryValueEx(aKey, name)
-    except WindowsError:
-        v=None
-    if v:
-        # we already have an entry, delete it!
-        wr.DeleteValue(aKey, name)
-        result=True
-    else:
-        try:
-            SetValueEx(aKey, name, 0, REG_SZ, executable)
-            result=True
-        except EnvironmentError as e:
-            print("couldn't write to registry: %s" % (e))
-    CloseKey(aKey)
-    CloseKey(hkcu)
-    return result
-
-
 class communicator(object):
     def __init__(self):
         super(communicator, self).__init__()
