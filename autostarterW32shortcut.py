@@ -81,7 +81,6 @@ class autostarter(autostarter_base):
         import os
         from win32com.client import Dispatch
         from pythoncom import com_error
-
         shell = Dispatch('WScript.Shell')
         try:
             shortcut = shell.CreateShortCut(destination)
@@ -89,8 +88,10 @@ class autostarter(autostarter_base):
             print("unable to create shortcut '%s': %s" % (destination, e))
             return False
         shortcut.Targetpath = source
-        shortcut.WorkingDirectory = workingDir
-        shortcut.IconLocation = icon
+        if workingDir:
+            shortcut.WorkingDirectory = workingDir
+        if icon:
+            shortcut.IconLocation = icon
         try:
             shortcut.save()
         except com_error as e:
@@ -129,7 +130,7 @@ if __name__ == '__main__':
     def runtest(starter):
         print("autostart: %s -> %s" % (starter.name, starter.executable))
         if starter.exists():
-            print("autostarter '%s' already exists. STOPPING" % (starter.name))
+            print("autostarter '%s' already exists. aborting test" % (starter.name))
             return
         r = starter.create()
         x = starter.exists()
@@ -141,4 +142,6 @@ if __name__ == '__main__':
     name = 'autostart test'
     script = os.path.abspath(sys.argv[0])
     starter = autostarter(name, script)
+    starter.workingDir=os.path.dirname(script)
+    starter.icon=os.path.join(starter.workingDir, 'media', 'DVImatrix848key.ico')
     runtest(starter)
