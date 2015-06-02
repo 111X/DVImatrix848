@@ -26,14 +26,18 @@ from autostarter import autostarter_base
 class autostarter(autostarter_base):
     def __init__(self, name, executable):
         super(autostarter, self).__init__(name, executable)
-        path=r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
-        self._registry=wr.ConnectRegistry(None, wr.HKEY_CURRENT_USER)
-        self._key=wr.OpenKey(self._registry, path, 0, wr.KEY_WRITE | wr.KEY_READ)
+        path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
+        self._registry = wr.ConnectRegistry(None, wr.HKEY_CURRENT_USER)
+        self._key = wr.OpenKey(
+            self._registry,
+            path,
+            0,
+            wr.KEY_WRITE | wr.KEY_READ)
 
     def exists(self):
         """returns True if there is already an autostarter called <name>"""
         try:
-            v=wr.QueryValueEx(self._key, self.name)
+            v = wr.QueryValueEx(self._key, self.name)
         except WindowsError:
             return False
         return True
@@ -77,7 +81,8 @@ if __name__ == '__main__':
     def runtest(starter):
         print("autostart: %s -> %s" % (starter.name, starter.executable))
         if starter.exists():
-            print("autostarter '%s' already exists. aborting test" % (starter.name))
+            print("autostarter '%s' already exists. aborting test"
+                  % (starter.name))
             return
         r = starter.create()
         x = starter.exists()
