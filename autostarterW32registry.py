@@ -28,8 +28,7 @@ class autostarter(autostarter_base):
         super(autostarter, self).__init__(name, executable)
         path=r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
         self._registry=wr.ConnectRegistry(None, wr.HKEY_CURRENT_USER)
-        self._wkey=wr.OpenKey(self._registry, path, 0, wr.KEY_WRITE)
-        self._key=wr.OpenKey(self._registry, path)
+        self._key=wr.OpenKey(self._registry, path, 0, wr.KEY_WRITE | wr.KEY_READ)
 
     def exists(self):
         """returns True if there is already an autostarter called <name>"""
@@ -44,7 +43,7 @@ class autostarter(autostarter_base):
         On success returns True, else False
         """
         try:
-            wr.SetValueEx(self._wkey, self.name, 0, wr.REG_SZ, self.executable)
+            wr.SetValueEx(self._key, self.name, 0, wr.REG_SZ, self.executable)
         except EnvironmentError as e:
             print("OOPS[%s] regwriting '%s' failed: %s"
                   % (type(e), self.name, e))
@@ -56,7 +55,7 @@ class autostarter(autostarter_base):
         On success returns True, else False
         """
         try:
-            wr.DeleteValue(self._wkey, self.name)
+            wr.DeleteValue(self._key, self.name)
         except Exception as e:
             print("OOPS[%s] regremoving '%s' failed: %s"
                   % (type(e), self.name, e))
