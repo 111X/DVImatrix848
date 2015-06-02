@@ -28,7 +28,8 @@ class autostarter(autostarter_base):
         super(autostarter, self).__init__(name, executable)
         path=r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
         self._registry=wr.ConnectRegistry(None, wr.HKEY_CURRENT_USER)
-        self._key=wr.OpenKey(self._registry, path, 0, KEY_WRITE)
+        self._wkey=wr.OpenKey(self._registry, path, 0, wr.KEY_WRITE)
+        self._key=wr.OpenKey(self._registry, path)
 
     def exists(self):
         """returns True if there is already an autostarter called <name>"""
@@ -43,7 +44,7 @@ class autostarter(autostarter_base):
         On success returns True, else False
         """
         try:
-            wr.SetValueEx(self._key, self.name, 0, REG_SZ, self.executable)
+            wr.SetValueEx(self._wkey, self.name, 0, wr.REG_SZ, self.executable)
         except EnvironmentError as e:
             print("OOPS[%s] regwriting '%s' failed: %s"
                   % (type(e), self.name, e))
@@ -55,7 +56,7 @@ class autostarter(autostarter_base):
         On success returns True, else False
         """
         try:
-            wr.DeleteValue(self._key, self.name)
+            wr.DeleteValue(self._wkey, self.name)
         except Exception as e:
             print("OOPS[%s] regremoving '%s' failed: %s"
                   % (type(e), self.name, e))
@@ -77,7 +78,7 @@ if __name__ == '__main__':
     def runtest(starter):
         print("autostart: %s -> %s" % (starter.name, starter.executable))
         if starter.exists():
-            print("autostarter '%s' already exists. STOPPING" % (starter.name))
+            print("autostarter '%s' already exists. aborting test" % (starter.name))
             return
         r = starter.create()
         x = starter.exists()
@@ -89,4 +90,5 @@ if __name__ == '__main__':
     name = 'autostart test'
     script = os.path.abspath(sys.argv[0])
     starter = autostarter(name, script)
+    runtest(starter)
     runtest(starter)
