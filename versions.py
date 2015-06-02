@@ -22,12 +22,11 @@ from distutils.version import LooseVersion
 
 import os.path
 import sys
-_SCRIPTDIR=os.path.dirname(os.path.abspath(sys.argv[0]))
-_CACERT=os.path.join(_SCRIPTDIR, 'cacert.pem')
+_SCRIPTDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
+_CACERT = os.path.join(_SCRIPTDIR, 'cacert.pem')
 if not os.path.exists(_CACERT):
-    _CACERT=True
+    _CACERT = True
 
-print("versions: %s" % (sys.argv[0]))
 
 def _stripVersionString(version_string):
     if version_string.startswith('v'):
