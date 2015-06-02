@@ -124,9 +124,10 @@ def zipit():
     v = getVersion()
     basename = BASENAME
     if v:
-        filename = '_'.join(basename, v)
+        filename = '_'.join([basename, v])
     else:
         filename = basename
+    filename=filename.replace('*', '+')
     shutil.make_archive(filename, 'zip', base_dir=basename)
 
 
