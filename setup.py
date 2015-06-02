@@ -64,7 +64,8 @@ def getCACERTfiles():
     
 
 if os.name == 'nt':
-    data_files = []
+    data_files = [("", ["about.json"])]
+
     f = getMSVCfiles()
     if f:
         data_files += [("Microsoft.VC90.CRT", f)]
