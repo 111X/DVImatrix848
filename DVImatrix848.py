@@ -109,57 +109,37 @@ def getConfigFile():
         os.mkdir(appdatadir)
     return os.path.join(appdatadir, "setup.json")
 
-
-def getHotkeyShortcut():
-    # calculate autostartdir
-    appdatadir = _getAppDataDir()
-    autostartdir = ''
-
-    if os.name == "nt":
-        autostartdir = os.path.join(
-            appdatadir,
-            'Microsoft',
-            'Windows',
-            'Start Menu',
-            'Programs',
-            'Startup',
-            )
-        targetpath = os.path.join(
-            autostartdir,
-            'DVImatrix848 hotkey.lnk'
-            )
-    else:
-        # LATER: support for other OSs
-        return None
-    if not os.path.isdir(autostartdir):
-        return None
-    return targetpath
-
-
-def _makeShortCut(destination, source, workingDir=None, icon=None):
-    # destination: r'C:\tmp\test.lnk'
-    # source     : r'C:\Program Files\DVImatrix848\DVImatrix.exe'
-    # workingDir : r'C:\Program Files\DVImatrix848'
-    # icon       : r'C:\Program Files\DVImatrix848\test.ico'
-    import os
-    from win32com.client import Dispatch
-    from pythoncom import com_error
-
-    shell = Dispatch('WScript.Shell')
+def getAutostarter(name):
     try:
-        shortcut = shell.CreateShortCut(destination)
-    except com_error as e:
-        print("unable to create shortcut '%s': %s" % (destination, e))
-        return False
-    shortcut.Targetpath = source
-    shortcut.WorkingDirectory = workingDir
-    shortcut.IconLocation = icon
+        from autostarterW32shortcut import autostarter
+    except ImportError:
+        return None
+
+    exe = os.path.join(_SCRIPTDIR, 'DVImatrix848key.exe')
+    if not os.path.exists(exe):
+        return None
+
     try:
-        shortcut.save()
-    except com_error as e:
-        print("unable to save shortcut '%s': %s" % (destination, e))
-        return False
-    return True
+        ast = autostarter(name, exe)
+    except ImportError:
+        return None
+
+    icon = os.path.join(
+        _SCRIPTDIR,
+        'media',
+        'DVImatrix848key.ico')
+    if not os.path.exist(icon):
+        icon=None
+    try:
+        ast.icon=icon
+    except AttributeError:
+        pass
+    try:
+        ast.workingDir=_SCRIPTDIR
+    except AttributeError:
+        pass
+    return ast
+
 
 def _registerAutostart(name, executable):
     import _winreg as wr
@@ -187,43 +167,6 @@ def _registerAutostart(name, executable):
     CloseKey(aKey)
     CloseKey(hkcu)
     return result
-
-def installHotkeyAutostart():
-    """
-    installs an autostart entry for the hotkey script
-    """
-    targetpath = getHotkeyShortcut()
-    if not targetpath:
-        return False
-    if os.path.exists(targetpath):
-        # delete it
-        try:
-            os.remove(targetpath)
-        except Exception as e:
-            print("OOPS[%s] removing autostart shortcut failed: %s"
-                  % (type(e), e))
-            return False
-        return True
-    else:
-        # create a shortcut in autostart
-        sourcedir = _SCRIPTDIR
-        source = os.path.join(
-            sourcedir,
-            'DVImatrix848key.exe',
-            )
-        if not os.path.exists(source):
-            return False
-        icon = os.path.join(
-            sourcedir,
-            'media'
-            'DVImatrix848key.ico',
-            )
-        return _makeShortCut(
-            targetpath,
-            source,
-            workingDir=sourcedir,
-            icon=icon)
-    return False
 
 
 class communicator(object):
@@ -425,8 +368,8 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menuConfiguration.addAction(self.menuSerial_Ports.menuAction())
 
         self.actionInstallHotkey = None
-        hotkeyshortcut = getHotkeyShortcut()
-        if hotkeyshortcut:
+        self.autostarter=getAutostarter('DVImatrix848 hotkey')
+        if self.autostarter:
             self.actionInstallHotkey = QtGui.QAction(self)
             self.actionInstallHotkey.activated.connect(
                 self.installHotkeyAutostart)
@@ -508,14 +451,11 @@ class DVImatrix848(QtGui.QMainWindow):
         self._updateTooltips()
 
     def configureHotkeyMenu(self, enable=None):
-        if not self.actionInstallHotkey:
+        if not self.autostarter or not self.actionInstallHotkey:
             return
 
         if enable is None:
-            enable = True
-            hotkeyshortcut = getHotkeyShortcut()
-            if hotkeyshortcut and os.path.exists(hotkeyshortcut):
-                enable = False
+            enable=self.autostarter.exists()
 
         if enable:
             self.actionInstallHotkey.setText(
@@ -529,7 +469,7 @@ class DVImatrix848(QtGui.QMainWindow):
                 "Disable global emergency hotkey permanently")
 
     def installHotkeyAutostart(self):
-        installHotkeyAutostart()
+        self.autostarter.toggle()
         self.configureHotkeyMenu()
 
     def about(self):
