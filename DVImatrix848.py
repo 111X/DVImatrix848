@@ -874,6 +874,7 @@ class aboutBox(QtGui.QDialog):
         self.setModal(True)
         self.verticalLayout = QtGui.QVBoxLayout(self)
         self.textBrowser = QtGui.QTextBrowser(self)
+        self.textBrowser.setOpenExternalLinks(True)
         self.verticalLayout.addWidget(self.textBrowser)
         self.buttonBox = QtGui.QDialogButtonBox(self)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
