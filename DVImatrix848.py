@@ -98,7 +98,7 @@ def _getAppDataDir():
         ]
     for ad in appdatadir:
         if os.path.exists(ad):
-            ad = os.path.join(ad, "DVImatrix848")
+            ad = os.path.join(ad, "iem.at", "DVImatrix848")
             try:
                 os.makedirs(ad)
             except OSError:
