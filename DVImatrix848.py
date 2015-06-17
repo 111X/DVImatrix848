@@ -98,7 +98,13 @@ def _getAppDataDir():
         ]
     for ad in appdatadir:
         if os.path.exists(ad):
-            return ad
+            ad = os.path.join(ad, "DVImatrix848")
+            try:
+                os.makedirs(ad)
+            except OSError:
+                pass
+            if os.path.isdir(ad):
+                return ad
     return None
 
 
@@ -106,9 +112,6 @@ def getConfigFile():
     appdatadir = _getAppDataDir()
     if not appdatadir:
         return
-    appdatadir = os.path.join(appdatadir, "DVImatrix848")
-    if not os.path.isdir(appdatadir):
-        os.mkdir(appdatadir)
     return os.path.join(appdatadir, "setup.json")
 
 
