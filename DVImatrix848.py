@@ -165,6 +165,7 @@ class communicator(object):
         # (important for parsing readback)
         ser.flushInput()
 
+        # wait until the device has settled
         sleeptime = self.connectTime + 1 - time.time()
         if sleeptime > 0:
                 time.sleep(sleeptime)
