@@ -932,6 +932,7 @@ if __name__ == '__main__':
 
     def is_frozen():
         import imp
+        return (os.name == 'nt')   # assume always frozen on W32
         return (hasattr(sys, "frozen") or      # new py2exe
                 hasattr(sys, "importers")      # old py2exe
                 or imp.is_frozen("__main__"))  # tools/freeze
