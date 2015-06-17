@@ -684,7 +684,8 @@ class DVImatrix848(QtGui.QMainWindow):
 
         try:
             d = config['serial']
-            self.serialport = d['port']
+            self.serialport = d.get('port', self.serialport)
+            self.comm.sleeptTime = d.get('sleep', self.comm.sleepTime)
         except (KeyError, TypeError) as e:
             warn('serial')
 
@@ -771,6 +772,8 @@ class DVImatrix848(QtGui.QMainWindow):
         portname = self.comm.getConnection()
         if portname:
             serialconf['port'] = portname
+        if self.comm.sleepTime:
+                serialconf['sleep'] = self.comm.sleepTime
         if serialconf:
             d['serial'] = serialconf
         print("portname = '%s'\nserialconf = %s\nconf = %s"
