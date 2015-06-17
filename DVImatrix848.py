@@ -188,7 +188,7 @@ class communicator(object):
         # connects to another device
         # if we cannot connect, this throws an exception
         logging.info("connecting to '%s' instead of '%s'"
-              % (device, self.getConnection()))
+                     % (device, self.getConnection()))
         if device == self.getConnection():
             return
         self._lastTime = None
@@ -604,7 +604,7 @@ class DVImatrix848(QtGui.QMainWindow):
     def selectSerial(self, portname=None, fetchMatrix=True):
         logging.info("selectSerial: fetch=%s" % (fetchMatrix))
         logging.info("selecting %s in %s"
-              % (portname, [x for (x, y) in self.serialPorts]))
+                     % (portname, [x for (x, y) in self.serialPorts]))
         for (name, action) in self.serialPorts:
             if portname is None:
                 selected = action.isChecked()
@@ -629,7 +629,9 @@ class DVImatrix848(QtGui.QMainWindow):
     def selectSerialByMenu(self):
         shouldselect = bool(self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC)
         logging.info("selectSerial: %s = %s&%s"
-              % (shouldselect, self.whenFetchMatrix, FETCHMATRIX_AUTOMATIC))
+                     % (shouldselect,
+                        self.whenFetchMatrix,
+                        FETCHMATRIX_AUTOMATIC))
         return self.selectSerial(fetchMatrix=shouldselect)
 
     def exit(self):
@@ -641,12 +643,14 @@ class DVImatrix848(QtGui.QMainWindow):
         for out in self.out4in:
             d[out] = self.out4in[out]
         self.default_out4in = d
-        logging.info("stored default routing matrix: %s" % (self.default_out4in))
+        logging.info("stored default routing matrix: %s"
+                     % (self.default_out4in))
 
     def restore(self):
         self.setRouting(self.default_out4in)
         self.showRouting(self.default_out4in)
-        logging.info("restored default routing matrix: %s" % (self.default_out4in))
+        logging.info("restored default routing matrix: %s"
+                     % (self.default_out4in))
 
     def readConfig(self, configfile=None):
         if not configfile:
@@ -780,7 +784,7 @@ class DVImatrix848(QtGui.QMainWindow):
         if serialconf:
             d['serial'] = serialconf
         logging.info("portname = '%s'\nserialconf = %s\nconf = %s"
-              % (portname, serialconf, d))
+                     % (portname, serialconf, d))
 
         if self.inputs:
             d['INPUTS'] = self.inputs
@@ -918,9 +922,9 @@ if __name__ == '__main__':
 
     def is_frozen():
         import imp
-        return (hasattr(sys, "frozen") or # new py2exe
-                hasattr(sys, "importers") # old py2exe
-                or imp.is_frozen("__main__")) # tools/freeze
+        return (hasattr(sys, "frozen") or      # new py2exe
+                hasattr(sys, "importers")      # old py2exe
+                or imp.is_frozen("__main__"))  # tools/freeze
     args = parseCmdlineArgs()
     if args.logfile is None:
         if is_frozen:
@@ -933,10 +937,15 @@ if __name__ == '__main__':
                     pass
                 else:
                     args.logfile = os.path.join(logdir, "DVImatrix.log")
-    loglevel = max(0, min(logging.FATAL, logging.WARNING+(args.quiet-args.verbose)*10))
+    loglevel = max(0,
+                   min(logging.FATAL,
+                       logging.WARNING+(args.quiet-args.verbose)*10))
 
     if args.logfile:
-        logging.basicConfig(filename=args.logfile, level=loglevel, filemode='w')
+        logging.basicConfig(
+            filename=args.logfile,
+            level=loglevel,
+            filemode='w')
     else:
         logging.basicConfig(level=loglevel, filemode='w')
     if args.version:
