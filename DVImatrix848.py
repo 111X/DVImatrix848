@@ -930,12 +930,17 @@ if __name__ == '__main__':
     if app.isRunning():
         sys.exit(0)
 
+    # make sure that all messages go to stderr
+    # (on w32, stderr is caught automatically, whereas stdout is discarded)
+    sys.stdout = sys.stderr
+
     def is_frozen():
         import imp
         return (os.name == 'nt')   # assume always frozen on W32
         return (hasattr(sys, "frozen") or      # new py2exe
                 hasattr(sys, "importers")      # old py2exe
                 or imp.is_frozen("__main__"))  # tools/freeze
+
     args = parseCmdlineArgs()
     if args.logfile is None:
         if is_frozen:
@@ -946,12 +951,11 @@ if __name__ == '__main__':
                     os.makedirs(logdir)
                 except (OSError):
                     pass
-                else:
+                if os.path.exists(logdir):
                     args.logfile = os.path.join(logdir, "DVImatrix.log")
     loglevel = max(0,
                    min(logging.FATAL,
                        logging.WARNING+(args.quiet-args.verbose)*10))
-
     if args.logfile:
         logging.basicConfig(
             filename=args.logfile,
