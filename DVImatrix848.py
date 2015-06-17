@@ -692,7 +692,7 @@ class DVImatrix848(QtGui.QMainWindow):
         try:
             d = config['serial']
             self.serialport = d.get('port', self.serialport)
-            self.comm.sleeptTime = d.get('sleep', self.comm.sleepTime)
+            self.comm.sleepTime = d.get('sleep', self.comm.sleepTime)
         except (KeyError, TypeError) as e:
             warn('serial')
 
