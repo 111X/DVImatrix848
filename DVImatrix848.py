@@ -147,7 +147,7 @@ class communicator(object):
     def __init__(self, sleepTime=0):
         super(communicator, self).__init__()
         self.serial = None
-        self.connectTime = None
+        self._lastTime = None
         self.sleepTime = sleepTime
 
     def send(self, data, readback=None):
@@ -158,7 +158,7 @@ class communicator(object):
         # send data to the device
         # will block if we have just opened the device
 
-        if not self.serial or not self.connectTime:
+        if not self.serial or not self._lastTime:
                 return None
         ser = self.serial
 
@@ -167,12 +167,14 @@ class communicator(object):
         ser.flushInput()
 
         # wait until the device has settled
-        sleeptime = self.sleepTime + self.connectTime + 1 - time.time()
+        sleeptime = self._lastTime + self.sleepTime - time.time()
         if sleeptime > 0:
                 time.sleep(sleeptime)
         ser.write(data)
 
         ser.flush()
+        self._lastTime = time.time()
+
         if readback is None:
             return None
         if readback is True:
@@ -188,14 +190,14 @@ class communicator(object):
               % (device, self.getConnection()))
         if device == self.getConnection():
             return
-        self.connectTime = None
+        self._lastTime = None
         self.serial = serial.Serial(
             port=device,
             baudrate=19200, bytesize=8, parity='N', stopbits=1,
             timeout=1  # untested
             )
-        # self.serial.flowControl(False)
-        self.connectTime = time.time()
+        # need to wait for at least 1sec until the device is usable
+        self._lastTime = time.time() + 1
         print("connected to '%s'" % self.getConnection())
 
     def getConnection(self):
