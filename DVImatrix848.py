@@ -144,10 +144,11 @@ def getAutostarter(name):
 
 
 class communicator(object):
-    def __init__(self):
+    def __init__(self, sleepTime=0):
         super(communicator, self).__init__()
         self.serial = None
         self.connectTime = None
+        self.sleepTime = sleepTime
 
     def send(self, data, readback=None):
         # 'readback' controls a subsequent 'read' operation
@@ -166,7 +167,7 @@ class communicator(object):
         ser.flushInput()
 
         # wait until the device has settled
-        sleeptime = self.connectTime + 1 - time.time()
+        sleeptime = self.sleepTime + self.connectTime + 1 - time.time()
         if sleeptime > 0:
                 time.sleep(sleeptime)
         ser.write(data)
