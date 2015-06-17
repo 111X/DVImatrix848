@@ -168,7 +168,10 @@ class communicator(object):
         ser.flushInput()
 
         # wait until the device has settled
-        sleeptime = self._lastTime + self.sleepTime - time.time()
+        now=time.time()
+        sleeptime = self._lastTime + self.sleepTime - now
+        logging.debug("sleeping %s seconds (%s-%s+%s)"
+                      % (sleeptime,self._lastTime, now, self.sleepTime))
         if sleeptime > 0:
                 time.sleep(sleeptime)
         ser.write(data)
