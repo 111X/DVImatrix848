@@ -892,6 +892,14 @@ def parseCmdlineArgs():
                         help="Restore emergency routing at startup")
     parser.add_argument('-V', '--version', action='store_true',
                         help="print program version and exit")
+    parser.add_argument('-L', '--logfile', type=str,
+                        help="Logfile to write to",
+                        default=None)
+    parser.add_argument('-v', '--verbose', action='count',
+                        help="raise verbosity", default=0)
+    parser.add_argument('-q', '--quiet', action='count',
+                        help="lower verbosity", default=0)
+
     args = parser.parse_args()
     return args
 
@@ -907,7 +915,30 @@ if __name__ == '__main__':
     app = QtSingleApplication(appGuid, sys.argv)
     if app.isRunning():
         sys.exit(0)
+
+    def is_frozen():
+        import imp
+        return (hasattr(sys, "frozen") or # new py2exe
+                hasattr(sys, "importers") # old py2exe
+                or imp.is_frozen("__main__")) # tools/freeze
     args = parseCmdlineArgs()
+    if args.logfile is None:
+        if is_frozen:
+            appdatadir = _getAppDataDir()
+            if appdatadir:
+                logdir = os.path.join(appdatadir, "Logs")
+                try:
+                    os.makedirs(logdir)
+                except (OSError):
+                    pass
+                else:
+                    args.logfile = os.path.join(logdir, "DVImatrix.log")
+    loglevel = max(0, min(logging.FATAL, logging.WARNING+(args.quiet-args.verbose)*10))
+
+    if args.logfile:
+        logging.basicConfig(filename=args.logfile, level=loglevel, filemode='w')
+    else:
+        logging.basicConfig(level=loglevel, filemode='w')
     if args.version:
         printVersion(sys.argv[0])
         sys.exit(0)
