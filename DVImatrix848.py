@@ -32,6 +32,7 @@ import serial
 import serial.tools.list_ports
 
 import json
+import logging
 
 FETCHMATRIX_NEVER = 0x0
 FETCHMATRIX_AUTOMATIC = 0x1
@@ -84,7 +85,7 @@ def _testRoutingParser():
     rs = _getRoutingMatrixUnparsed(r0)
     r1 = _parseRoutingMatrixString(rs)
     if r0 == r1:
-        print("%d bytes match: %s" % (len(rs), r0))
+        logging.debug("%d bytes match: %s" % (len(rs), r0))
 
 
 def _getAppDataDir():
@@ -153,7 +154,7 @@ class communicator(object):
     def send(self, data, readback=None):
         # 'readback' controls a subsequent 'read' operation
         # - positive ints:
-        print("TODO: write '%s'" % (data))
+        logging.info("TODO: write '%s'" % (data))
 
         # send data to the device
         # will block if we have just opened the device
@@ -186,7 +187,7 @@ class communicator(object):
     def connect(self, device):
         # connects to another device
         # if we cannot connect, this throws an exception
-        print("connecting to '%s' instead of '%s'"
+        logging.info("connecting to '%s' instead of '%s'"
               % (device, self.getConnection()))
         if device == self.getConnection():
             return
@@ -198,7 +199,7 @@ class communicator(object):
             )
         # need to wait for at least 1sec until the device is usable
         self._lastTime = time.time() + 1
-        print("connected to '%s'" % self.getConnection())
+        logging.info("connected to '%s'" % self.getConnection())
 
     def getConnection(self):
         # gets the name of the current connection
@@ -268,10 +269,10 @@ class DVImatrix848(QtGui.QMainWindow):
         if self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC:
             self.getMatrix()
         else:
-            print("using config-matrix: %s" % (self.out4in))
+            logging.info("using config-matrix: %s" % (self.out4in))
             self.setRouting(self.out4in)
             self.showRouting(self.out4in)
-        print("when: %s" % self.whenFetchMatrix)
+        logging.info("when: %s" % self.whenFetchMatrix)
         if restore:
             self.restore()
 
@@ -371,7 +372,7 @@ class DVImatrix848(QtGui.QMainWindow):
             self.aboutBox = aboutBox()
         except (IOError, ValueError, KeyError) as e:
             # couldn't initialize aboutBox, continue without
-            print("disabling ABOUT: %s" % e)
+            logging.warn("disabling ABOUT: %s" % e)
         if self.aboutBox:
             self.actionAbout = QtGui.QAction(self)
             self.actionAbout.setText("Check for updates")
@@ -390,9 +391,9 @@ class DVImatrix848(QtGui.QMainWindow):
         self.menuSerial_Ports.setTitle("Serial Ports")
 
         self.matrixButton = QtGui.QPushButton("Get State")
-        print("fetchmatrix: %s" % (self.whenFetchMatrix))
+        logging.info("fetchmatrix: %s" % (self.whenFetchMatrix))
         if self.whenFetchMatrix & FETCHMATRIX_INTERACTIVE:
-            print("interactive")
+            logging.info("interactive")
             self.matrixButton.setEnabled(True)
         else:
             self.matrixButton.setEnabled(False)
@@ -516,11 +517,11 @@ class DVImatrix848(QtGui.QMainWindow):
 
     def getMatrix(self):
         routes = self.comm.getRoutes()
-        print("got matrix: %s" % (routes))
+        logging.debug("got matrix: %s" % (routes))
         self.setRouting(routes, False)
 
     def setRouting(self, routes, apply=True):
-        print("setRouting: %s" % (routes))
+        logging.debug("setRouting: %s" % (routes))
         for og in self.outgroup:
             btn = og.checkedButton()
             if btn:
@@ -542,7 +543,7 @@ class DVImatrix848(QtGui.QMainWindow):
         for o in routes:
             try:
                 i = routes[o]
-                # print("input[%s] -> output[%s]" % (i, o))
+                # logging.debug("input[%s] -> output[%s]" % (i, o))
                 buttons = self.outgroup[o].buttons()
                 buttons[i].setChecked(True)
             except IndexError:
@@ -552,9 +553,9 @@ class DVImatrix848(QtGui.QMainWindow):
         btngrp = btn.group()
         innum = btngrp.checkedId()
         outnum = -1
-        # print("outgroup: %s" % (self.outgroup))
+        # logging.debug("outgroup: %s" % (self.outgroup))
         for on, og in enumerate(self.outgroup):
-            # print("out[%s]=%s" % (on, og))
+            # logging.debug("out[%s]=%s" % (on, og))
             if og is btngrp:
                 outnum = on
                 break
@@ -562,10 +563,10 @@ class DVImatrix848(QtGui.QMainWindow):
             self.routeInput2Output(innum, outnum)
 
     def routeInput2Output(self, innum, outnum):
-        print("%s -> %s [%s]" % (outnum, innum, self.out4in))
+        logging.info("%s -> %s [%s]" % (outnum, innum, self.out4in))
         self.out4in[outnum] = innum
         self.comm.route(innum, outnum)
-        # print("TODO: connect: %s -> %s" % (innum, outnum))
+        # logging.info("TODO: connect: %s -> %s" % (innum, outnum))
 
     def rescanSerial(self):
         lastselected = ""
@@ -601,8 +602,8 @@ class DVImatrix848(QtGui.QMainWindow):
                 self.selectSerial()
 
     def selectSerial(self, portname=None, fetchMatrix=True):
-        print("selectSerial: fetch=%s" % (fetchMatrix))
-        print("selecting %s in %s"
+        logging.info("selectSerial: fetch=%s" % (fetchMatrix))
+        logging.info("selecting %s in %s"
               % (portname, [x for (x, y) in self.serialPorts]))
         for (name, action) in self.serialPorts:
             if portname is None:
@@ -610,7 +611,7 @@ class DVImatrix848(QtGui.QMainWindow):
             else:
                 selected = (portname == name)
             if selected:
-                print("selected serial port: %s" % (name))
+                logging.info("selected serial port: %s" % (name))
                 try:
                     self.comm.connect(name)
                     action.setChecked(True)
@@ -627,7 +628,7 @@ class DVImatrix848(QtGui.QMainWindow):
 
     def selectSerialByMenu(self):
         shouldselect = bool(self.whenFetchMatrix & FETCHMATRIX_AUTOMATIC)
-        print("selectSerial: %s = %s&%s"
+        logging.info("selectSerial: %s = %s&%s"
               % (shouldselect, self.whenFetchMatrix, FETCHMATRIX_AUTOMATIC))
         return self.selectSerial(fetchMatrix=shouldselect)
 
@@ -640,12 +641,12 @@ class DVImatrix848(QtGui.QMainWindow):
         for out in self.out4in:
             d[out] = self.out4in[out]
         self.default_out4in = d
-        print("stored default routing matrix: %s" % (self.default_out4in))
+        logging.info("stored default routing matrix: %s" % (self.default_out4in))
 
     def restore(self):
         self.setRouting(self.default_out4in)
         self.showRouting(self.default_out4in)
-        print("restored default routing matrix: %s" % (self.default_out4in))
+        logging.info("restored default routing matrix: %s" % (self.default_out4in))
 
     def readConfig(self, configfile=None):
         if not configfile:
@@ -728,7 +729,7 @@ class DVImatrix848(QtGui.QMainWindow):
                     except (ValueError):
                         pass
                 self.out4in = routes
-                print("configmatrix: %s" % (routes))
+                logging.info("configmatrix: %s" % (routes))
         except (KeyError, TypeError) as e:
             warn('matrix')
 
@@ -743,7 +744,7 @@ class DVImatrix848(QtGui.QMainWindow):
                     except (ValueError):
                         pass
                 self.default_out4in = routes
-                print("defaultmatrix: %s" % (routes))
+                logging.info("defaultmatrix: %s" % (routes))
         except (KeyError, TypeError) as e:
             warn('defaultmatrix')
 
@@ -778,7 +779,7 @@ class DVImatrix848(QtGui.QMainWindow):
                 serialconf['sleep'] = self.comm.sleepTime
         if serialconf:
             d['serial'] = serialconf
-        print("portname = '%s'\nserialconf = %s\nconf = %s"
+        logging.info("portname = '%s'\nserialconf = %s\nconf = %s"
               % (portname, serialconf, d))
 
         if self.inputs:
@@ -802,7 +803,7 @@ class DVImatrix848(QtGui.QMainWindow):
 
     def status(self, text):
         self.statusBar().showMessage(text)
-        print("STATE: %s" % text)
+        logging.warn("STATE: %s" % text)
 
 
 class aboutBox(QtGui.QDialog):
