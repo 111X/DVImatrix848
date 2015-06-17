@@ -638,8 +638,15 @@ class DVImatrix848(QtGui.QMainWindow):
         return self.selectSerial(fetchMatrix=shouldselect)
 
     def exit(self):
+        logging.info("Bye")
         self.writeConfig()
+        logging.info("ByeBye")
         sys.exit()
+
+    def closeEvent(self, event):
+        logging.info("closeEvent")
+        event.ignore()
+        self.exit()
 
     def store(self):
         d = {}
