@@ -245,7 +245,7 @@ class DVImatrix848(QtGui.QMainWindow):
         self.serialPorts = []  # array of name/menuitem pais
         self.serialport = None
 
-        self.comm = communicator()
+        self.comm = communicator(sleepTime=0.250)
 
         if configfile is None:
             configfile = getConfigFile()
